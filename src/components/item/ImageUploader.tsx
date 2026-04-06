@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Camera } from "lucide-react";
 import { uploadImage } from "@/lib/storage";
 import { MAX_IMAGES_PER_ITEM } from "@/config/constants";
 
@@ -13,7 +13,8 @@ interface Props {
 
 export default function ImageUploader({ userId, images, onChange }: Props) {
   const [uploading, setUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -34,13 +35,16 @@ export default function ImageUploader({ userId, images, onChange }: Props) {
 
     onChange(newUrls);
     setUploading(false);
-    if (inputRef.current) inputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const removeImage = (index: number) => {
     const updated = images.filter((_, i) => i !== index);
     onChange(updated);
   };
+
+  const canAdd = images.length < MAX_IMAGES_PER_ITEM && !uploading;
 
   return (
     <div className="space-y-2">
@@ -62,11 +66,23 @@ export default function ImageUploader({ userId, images, onChange }: Props) {
           </div>
         ))}
 
-        {images.length < MAX_IMAGES_PER_ITEM && (
+        {/* Camera capture button — opens phone camera directly */}
+        {canAdd && (
           <button
             type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={uploading}
+            onClick={() => cameraInputRef.current?.click()}
+            className="aspect-square rounded-lg border-2 border-dashed border-[var(--color-accent)] flex flex-col items-center justify-center gap-1 bg-[var(--color-accent)]/5 hover:bg-[var(--color-accent)]/10 transition-colors"
+          >
+            <Camera className="w-5 h-5 text-[var(--color-accent)]" />
+            <span className="text-[10px] text-[var(--color-accent)] font-medium">Camera</span>
+          </button>
+        )}
+
+        {/* Gallery upload button */}
+        {canAdd && (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
             className="aspect-square rounded-lg border-2 border-dashed border-[var(--color-border)] flex flex-col items-center justify-center gap-1 hover:border-[var(--color-accent)] transition-colors"
           >
             {uploading ? (
@@ -74,15 +90,26 @@ export default function ImageUploader({ userId, images, onChange }: Props) {
             ) : (
               <>
                 <Upload className="w-4 h-4 text-[var(--color-text-muted)]" />
-                <span className="text-[10px] text-[var(--color-text-muted)]">Upload</span>
+                <span className="text-[10px] text-[var(--color-text-muted)]">Gallery</span>
               </>
             )}
           </button>
         )}
       </div>
 
+      {/* Camera input — capture="environment" opens rear camera on mobile */}
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleUpload}
+        className="hidden"
+      />
+
+      {/* Gallery input — no capture attr = opens file picker / photo gallery */}
+      <input
+        ref={fileInputRef}
         type="file"
         accept="image/*"
         multiple

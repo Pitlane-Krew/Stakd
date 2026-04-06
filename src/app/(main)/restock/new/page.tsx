@@ -8,9 +8,12 @@ import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
 import { createRestock } from "@/services/restocks";
 import { getCategories } from "@/config/category-registry";
+import { useAuth } from "@/hooks/useAuth";
+import { uploadImage } from "@/lib/storage";
 
 export default function NewRestockPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const categories = getCategories();
 
   const [form, setForm] = useState({
@@ -20,6 +23,8 @@ export default function NewRestockPage() {
     category: "",
     description: "",
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,8 +69,19 @@ export default function NewRestockPage() {
     );
   }
 
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) {
+      setError("You must be signed in to report a restock");
+      return;
+    }
     if (!form.store_name || !form.item_found) {
       setError("Store name and item found are required");
       return;
@@ -75,14 +91,20 @@ export default function NewRestockPage() {
     setError(null);
 
     try {
-      // TODO: Get actual user_id from auth context
+      let photoUrl: string | undefined;
+      if (photoFile) {
+        const result = await uploadImage("restocks", photoFile, user.id);
+        photoUrl = result.url;
+      }
+
       await createRestock({
-        user_id: "placeholder",
+        user_id: user.id,
         store_name: form.store_name,
         store_address: form.store_address || undefined,
         item_found: form.item_found,
         category: form.category || undefined,
         description: form.description || undefined,
+        image_url: photoUrl,
       });
       router.push("/restock");
     } catch (err) {
@@ -197,17 +219,37 @@ export default function NewRestockPage() {
             />
           </div>
 
-          {/* Photo placeholder */}
+          {/* Photo with camera capture */}
           <div>
             <label className="block text-sm font-medium mb-1.5">
               Photo (optional)
             </label>
-            <div className="flex items-center justify-center h-32 rounded-lg border-2 border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] text-sm cursor-pointer hover:border-[var(--color-accent)] transition-colors">
-              <div className="text-center">
-                <Camera className="w-6 h-6 mx-auto mb-1" />
-                <p>Tap to add photo</p>
+            {photoPreview ? (
+              <div className="relative h-40 rounded-lg overflow-hidden border border-[var(--color-border)]">
+                <img src={photoPreview} alt="Restock" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                  className="absolute top-2 right-2 p-1 bg-black/60 rounded-full text-white"
+                >
+                  &times;
+                </button>
               </div>
-            </div>
+            ) : (
+              <label className="flex items-center justify-center h-32 rounded-lg border-2 border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] text-sm cursor-pointer hover:border-[var(--color-accent)] transition-colors">
+                <div className="text-center">
+                  <Camera className="w-6 h-6 mx-auto mb-1" />
+                  <p>Tap to take photo</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhoto}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
 
           {error && (

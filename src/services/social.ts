@@ -127,6 +127,122 @@ export async function markAllAsRead(userId: string): Promise<void> {
 }
 
 // -------------------------------------------------------------------
+// Posts & Feed (uses 006_social.sql posts table)
+// -------------------------------------------------------------------
+
+export interface PostWithProfile {
+  id: string;
+  user_id: string;
+  content: string | null;
+  image_urls: string[];
+  post_type: string;
+  item_id: string | null;
+  like_count: number;
+  comment_count: number;
+  created_at: string;
+  profiles: {
+    display_name: string | null;
+    username: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
+export async function getRecentPosts(limit = 30): Promise<PostWithProfile[]> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*, profiles(display_name, username, avatar_url)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return (data ?? []) as unknown as PostWithProfile[];
+}
+
+export async function getFeedPosts(userId: string, limit = 30): Promise<PostWithProfile[]> {
+  // Get who user follows
+  const { data: follows } = await supabase
+    .from("follows")
+    .select("following_id")
+    .eq("follower_id", userId);
+
+  const followingIds = (follows ?? []).map((f) => f.following_id);
+  // Include own posts + followed users' posts
+  const allIds = [...followingIds, userId];
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*, profiles(display_name, username, avatar_url)")
+    .in("user_id", allIds)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return (data ?? []) as unknown as PostWithProfile[];
+}
+
+export async function createPost(input: {
+  user_id: string;
+  content: string;
+  post_type?: string;
+  image_urls?: string[];
+  item_id?: string;
+}): Promise<void> {
+  const { error } = await supabase.from("posts").insert({
+    user_id: input.user_id,
+    content: input.content,
+    post_type: input.post_type || "general",
+    image_urls: input.image_urls || [],
+    item_id: input.item_id ?? null,
+  });
+  if (error) throw error;
+}
+
+export async function toggleLike(userId: string, postId: string): Promise<boolean> {
+  const { data: existing } = await supabase
+    .from("likes")
+    .select("user_id")
+    .eq("user_id", userId)
+    .eq("post_id", postId)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase.from("likes").delete().eq("user_id", userId).eq("post_id", postId);
+    return false; // unliked
+  } else {
+    await supabase.from("likes").insert({ user_id: userId, post_id: postId });
+    return true; // liked
+  }
+}
+
+export async function getUserLikedPosts(userId: string): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("likes")
+    .select("post_id")
+    .eq("user_id", userId);
+  return new Set((data ?? []).map((l) => l.post_id));
+}
+
+export async function getFollowingSet(userId: string): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("follows")
+    .select("following_id")
+    .eq("follower_id", userId);
+  return new Set((data ?? []).map((f) => f.following_id));
+}
+
+export async function discoverProfiles(currentUserId: string, limit = 20) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, username, avatar_url, bio, reputation_score")
+    .neq("id", currentUserId)
+    .order("reputation_score", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+// -------------------------------------------------------------------
 // Collection Sharing
 // -------------------------------------------------------------------
 
