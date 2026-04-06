@@ -1,0 +1,13 @@
+{
+  "title": "ルートプランナー",
+  "plan_route": "ルートを計画",
+  "add_stop": "立ち寄り先を追加",
+  "optimize": "ルートを最適化",
+  "save_route": "ルートを保存",
+  "stop_name": "立ち寄り先の名前",
+  "address": "住所",
+  "stops": "立ち寄り先",
+  "distance": "距離",
+  "duration": "時間",
+  "empty_state": "ルートを計画するために立ち寄り先を追加してください"
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Seguimiento de Reabastecimientos",
+  "report_restock": "Reportar Reabastecimiento",
+  "store_name": "Nombre de la Tienda",
+  "store_address": "Dirección de la Tienda",
+  "item_found": "Artículo Encontrado",
+  "freshness": "Recencia",
+  "verified": "{count} verificados",
+  "verify": "Verificar",
+  "nearby": "{count} reabastecimientos cerca",
+  "detect_location": "Detectar Ubicación",
+  "additional_details": "Detalles Adicionales",
+  "add_photo": "Agregar Foto",
+  "empty_state": "No hay reabastecimientos en tu área",
+  "map_view": "Vista de Mapa",
+  "list_view": "Vista de Lista"
+}

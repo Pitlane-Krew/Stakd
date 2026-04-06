@@ -1,0 +1,13 @@
+{
+  "title": "スキャン・識別",
+  "camera_scan": "カメラでスキャン",
+  "manual_entry": "手動入力",
+  "photo_ai": "フォトAI",
+  "scanning": "スキャン中...",
+  "point_camera": "バーコードにカメラを向けてください",
+  "scan_results": "スキャン結果",
+  "recent_scans": "最近のスキャン",
+  "add_to_collection": "コレクションに追加",
+  "report_restock": "入荷情報を報告",
+  "supported_formats": "対応フォーマット：EAN-13、UPC-A、QRコード、Code 128"
+}

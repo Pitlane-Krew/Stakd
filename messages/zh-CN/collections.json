@@ -1,0 +1,15 @@
+{
+  "title": "藏品库",
+  "my_collections": "我的藏品库",
+  "create_collection": "创建藏品库",
+  "edit_collection": "编辑藏品库",
+  "collection_name": "藏品库名称",
+  "description": "描述",
+  "category": "分类",
+  "public": "公开",
+  "private": "私密",
+  "item_count": "{count}件藏品",
+  "total_value": "总价值",
+  "empty_state": "开始建立你的藏品库",
+  "delete_confirm": "确定要删除此藏品库吗?"
+}

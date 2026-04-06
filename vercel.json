@@ -1,0 +1,38 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "devCommand": "next dev",
+  "installCommand": "npm install",
+
+  "crons": [
+    {
+      "path": "/api/cron/freshness",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/prices",
+      "schedule": "0 2 * * *"
+    }
+  ],
+
+  "functions": {
+    "src/app/api/grading/analyze/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/ai/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/valuation/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/routes/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/cron/prices/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/cron/freshness/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}

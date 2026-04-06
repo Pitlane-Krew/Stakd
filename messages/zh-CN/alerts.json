@@ -1,0 +1,13 @@
+{
+  "title": "通知",
+  "restock_alerts": "补货提醒",
+  "add_alert": "添加提醒",
+  "any_category": "任意分类",
+  "keyword": "关键词",
+  "radius": "半径: {miles} 英里",
+  "enabled": "已启用",
+  "disabled": "已禁用",
+  "new_matches": "找到 {count} 个新的交易匹配!",
+  "friend_added": "{name} 在他们的藏品库中添加了新藏品",
+  "price_change": "{item} 价值 {direction} {percent}%"
+}

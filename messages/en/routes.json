@@ -1,0 +1,13 @@
+{
+  "title": "Route Planner",
+  "plan_route": "Plan Route",
+  "add_stop": "Add Stop",
+  "optimize": "Optimize Route",
+  "save_route": "Save Route",
+  "stop_name": "Stop Name",
+  "address": "Address",
+  "stops": "Stops",
+  "distance": "Distance",
+  "duration": "Time",
+  "empty_state": "Add stops to plan your route"
+}

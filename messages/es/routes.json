@@ -1,0 +1,13 @@
+{
+  "title": "Planificador de Rutas",
+  "plan_route": "Planificar Ruta",
+  "add_stop": "Agregar Parada",
+  "optimize": "Optimizar Ruta",
+  "save_route": "Guardar Ruta",
+  "stop_name": "Nombre de la Parada",
+  "address": "Dirección",
+  "stops": "Paradas",
+  "distance": "Distancia",
+  "duration": "Tiempo",
+  "empty_state": "Agrega paradas para planificar tu ruta"
+}

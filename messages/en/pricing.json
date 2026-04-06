@@ -1,0 +1,20 @@
+{
+  "estimated_value": "Estimated Value",
+  "market_value": "Market Value",
+  "price_trend": "Price Trend",
+  "roi": "ROI",
+  "purchased_for": "Purchased for {amount}",
+  "value_change": "{direction} {percent}% ({period})",
+  "time_ranges": {
+    "7d": "7D",
+    "30d": "30D",
+    "90d": "90D",
+    "1y": "1Y",
+    "all": "ALL"
+  },
+  "sources": {
+    "ebay": "eBay",
+    "psa": "PSA",
+    "goldin": "Goldin"
+  }
+}

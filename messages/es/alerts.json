@@ -1,0 +1,13 @@
+{
+  "title": "Notificaciones",
+  "restock_alerts": "Alertas de Reabastecimiento",
+  "add_alert": "Agregar Alerta",
+  "any_category": "Cualquier categoría",
+  "keyword": "Palabra Clave",
+  "radius": "Radio: {miles} millas",
+  "enabled": "Activado",
+  "disabled": "Desactivado",
+  "new_matches": "¡Se encontraron {count} nuevas coincidencias de intercambio!",
+  "friend_added": "{name} agregó un nuevo artículo a su colección",
+  "price_change": "El valor de {item} cambió {direction} {percent}%"
+}

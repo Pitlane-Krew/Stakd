@@ -1,0 +1,15 @@
+{
+  "feed": "Feed",
+  "post": "Post",
+  "comment": "Comment",
+  "like": "Like",
+  "share": "Share",
+  "follow": "Follow",
+  "unfollow": "Unfollow",
+  "followers": "Followers",
+  "following": "Following",
+  "translate_post": "Translate post",
+  "translate_comment": "Translate comment",
+  "translating": "Translating...",
+  "show_original": "Show original"
+}

@@ -1,0 +1,18 @@
+{
+  "add_item": "Add Item",
+  "edit_item": "Edit Item",
+  "item_name": "Item Name",
+  "condition": "Condition",
+  "grade": "Grade",
+  "grading_company": "Grading Company",
+  "estimated_value": "Estimated Value",
+  "purchase_price": "Purchase Price",
+  "purchase_date": "Purchase Date",
+  "for_trade": "For Trade",
+  "for_sale": "For Sale",
+  "tags": "Tags",
+  "attributes": "Details",
+  "price_history": "Price History",
+  "recent_sales": "Recent Sales",
+  "no_price_data": "No price data available yet"
+}

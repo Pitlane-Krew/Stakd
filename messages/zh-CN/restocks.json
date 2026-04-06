@@ -1,0 +1,17 @@
+{
+  "title": "补货追踪",
+  "report_restock": "报告补货",
+  "store_name": "店铺名称",
+  "store_address": "店铺地址",
+  "item_found": "找到的藏品",
+  "freshness": "新鲜度",
+  "verified": "{count}位验证",
+  "verify": "验证",
+  "nearby": "附近{count}个补货信息",
+  "detect_location": "检测位置",
+  "additional_details": "其他详情",
+  "add_photo": "添加照片",
+  "empty_state": "你的地区暂无补货信息",
+  "map_view": "地图视图",
+  "list_view": "列表视图"
+}

@@ -1,0 +1,13 @@
+{
+  "title": "路线规划",
+  "plan_route": "规划路线",
+  "add_stop": "添加站点",
+  "optimize": "优化路线",
+  "save_route": "保存路线",
+  "stop_name": "站点名称",
+  "address": "地址",
+  "stops": "站点",
+  "distance": "距离",
+  "duration": "耗时",
+  "empty_state": "添加站点以规划你的路线"
+}

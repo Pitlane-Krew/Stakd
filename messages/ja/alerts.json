@@ -1,0 +1,13 @@
+{
+  "title": "通知",
+  "restock_alerts": "入荷アラート",
+  "add_alert": "アラートを追加",
+  "any_category": "すべてのカテゴリー",
+  "keyword": "キーワード",
+  "radius": "半径：{miles}マイル",
+  "enabled": "有効",
+  "disabled": "無効",
+  "new_matches": "{count}件のトレードマッチが見つかりました！",
+  "friend_added": "{name}があなたのコレクションに新しいアイテムを追加しました",
+  "price_change": "{item}の価値が{direction} {percent}%変わりました"
+}

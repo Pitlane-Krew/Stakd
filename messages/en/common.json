@@ -1,0 +1,48 @@
+{
+  "app_name": "STAKD",
+  "tagline": "Your collection. Your data. Your edge.",
+  "loading": "Loading...",
+  "error": "Something went wrong",
+  "success": "Success",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "search": "Search",
+  "filter": "Filter",
+  "sort": "Sort",
+  "back": "Back",
+  "next": "Next",
+  "previous": "Previous",
+  "close": "Close",
+  "confirm": "Confirm",
+  "submit": "Submit",
+  "view_all": "View All",
+  "no_results": "No results found",
+  "required_field": "This field is required",
+  "optional": "Optional",
+  "nav": {
+    "dashboard": "Dashboard",
+    "collections": "Collections",
+    "restocks": "Restocks",
+    "routes": "Routes",
+    "scan": "Scan",
+    "trades": "Trades",
+    "feed": "Feed",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "time": {
+    "just_now": "just now",
+    "minutes_ago": "{count}m ago",
+    "hours_ago": "{count}h ago",
+    "days_ago": "{count}d ago",
+    "weeks_ago": "{count}w ago"
+  }
+}

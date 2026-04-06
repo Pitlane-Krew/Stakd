@@ -1,0 +1,14 @@
+{
+  "title": "トレードセンター",
+  "matches": "トレードマッチ",
+  "want_list": "欲しいリスト",
+  "proposals": "提案",
+  "browse": "閲覧",
+  "they_offer": "相手の提供物",
+  "they_want": "相手の希望",
+  "match_score": "{score}%マッチ",
+  "accept": "承認",
+  "decline": "却下",
+  "message": "メッセージ",
+  "add_to_want_list": "欲しいリストに追加"
+}

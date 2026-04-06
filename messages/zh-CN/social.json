@@ -1,0 +1,15 @@
+{
+  "feed": "动态",
+  "post": "发布",
+  "comment": "评论",
+  "like": "点赞",
+  "share": "分享",
+  "follow": "关注",
+  "unfollow": "取消关注",
+  "followers": "粉丝",
+  "following": "关注中",
+  "translate_post": "翻译帖子",
+  "translate_comment": "翻译评论",
+  "translating": "翻译中...",
+  "show_original": "显示原文"
+}

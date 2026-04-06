@@ -1,0 +1,18 @@
+{
+  "add_item": "Agregar Artículo",
+  "edit_item": "Editar Artículo",
+  "item_name": "Nombre del Artículo",
+  "condition": "Condición",
+  "grade": "Calificación",
+  "grading_company": "Empresa Calificadora",
+  "estimated_value": "Valor Estimado",
+  "purchase_price": "Precio de Compra",
+  "purchase_date": "Fecha de Compra",
+  "for_trade": "Para Intercambiar",
+  "for_sale": "En Venta",
+  "tags": "Etiquetas",
+  "attributes": "Detalles",
+  "price_history": "Historial de Precios",
+  "recent_sales": "Ventas Recientes",
+  "no_price_data": "Datos de precio no disponibles aún"
+}

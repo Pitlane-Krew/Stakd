@@ -1,0 +1,14 @@
+{
+  "title": "Centro de Intercambios",
+  "matches": "Coincidencias de Intercambio",
+  "want_list": "Lista de Búsqueda",
+  "proposals": "Propuestas",
+  "browse": "Explorar",
+  "they_offer": "Ellos Ofrecen",
+  "they_want": "Ellos Buscan",
+  "match_score": "{score}% coincidencia",
+  "accept": "Aceptar",
+  "decline": "Rechazar",
+  "message": "Mensaje",
+  "add_to_want_list": "Agregar a Lista de Búsqueda"
+}

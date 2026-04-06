@@ -1,0 +1,13 @@
+{
+  "title": "Escanear e Identificar",
+  "camera_scan": "Escanear con Cámara",
+  "manual_entry": "Entrada Manual",
+  "photo_ai": "IA de Foto",
+  "scanning": "Escaneando...",
+  "point_camera": "Apunta la cámara al código de barras",
+  "scan_results": "Resultados del Escaneo",
+  "recent_scans": "Escaneos Recientes",
+  "add_to_collection": "Agregar a Colección",
+  "report_restock": "Reportar Reabastecimiento",
+  "supported_formats": "Compatible: EAN-13, UPC-A, QR Code, Code 128"
+}

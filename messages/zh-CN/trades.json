@@ -1,0 +1,14 @@
+{
+  "title": "交易中心",
+  "matches": "交易匹配",
+  "want_list": "想要清单",
+  "proposals": "提议",
+  "browse": "浏览",
+  "they_offer": "他们提供",
+  "they_want": "他们想要",
+  "match_score": "{score}% 匹配度",
+  "accept": "接受",
+  "decline": "拒绝",
+  "message": "消息",
+  "add_to_want_list": "加入想要清单"
+}

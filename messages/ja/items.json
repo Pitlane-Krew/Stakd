@@ -1,0 +1,18 @@
+{
+  "add_item": "アイテムを追加",
+  "edit_item": "アイテムを編集",
+  "item_name": "アイテム名",
+  "condition": "状態",
+  "grade": "グレード",
+  "grading_company": "グレーディング企業",
+  "estimated_value": "推定価格",
+  "purchase_price": "購入価格",
+  "purchase_date": "購入日",
+  "for_trade": "トレード対象",
+  "for_sale": "販売予定",
+  "tags": "タグ",
+  "attributes": "詳細",
+  "price_history": "価格履歴",
+  "recent_sales": "最近の売却",
+  "no_price_data": "価格データはまだありません"
+}

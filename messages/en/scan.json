@@ -1,0 +1,13 @@
+{
+  "title": "Scan & Identify",
+  "camera_scan": "Camera Scan",
+  "manual_entry": "Manual Entry",
+  "photo_ai": "Photo AI",
+  "scanning": "Scanning...",
+  "point_camera": "Point camera at barcode",
+  "scan_results": "Scan Results",
+  "recent_scans": "Recent Scans",
+  "add_to_collection": "Add to Collection",
+  "report_restock": "Report Restock",
+  "supported_formats": "Supported: EAN-13, UPC-A, QR Code, Code 128"
+}

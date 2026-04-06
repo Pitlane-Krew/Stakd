@@ -1,0 +1,13 @@
+{
+  "title": "Notifications",
+  "restock_alerts": "Restock Alerts",
+  "add_alert": "Add Alert",
+  "any_category": "Any category",
+  "keyword": "Keyword",
+  "radius": "Radius: {miles} miles",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "new_matches": "{count} new trade matches found!",
+  "friend_added": "{name} added a new item to their collection",
+  "price_change": "{item} value changed {direction} {percent}%"
+}

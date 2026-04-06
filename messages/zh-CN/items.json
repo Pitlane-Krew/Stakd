@@ -1,0 +1,18 @@
+{
+  "add_item": "添加藏品",
+  "edit_item": "编辑藏品",
+  "item_name": "藏品名称",
+  "condition": "品相",
+  "grade": "评级",
+  "grading_company": "评级公司",
+  "estimated_value": "估计价值",
+  "purchase_price": "购买价格",
+  "purchase_date": "购买日期",
+  "for_trade": "可交易",
+  "for_sale": "可出售",
+  "tags": "标签",
+  "attributes": "详情",
+  "price_history": "价格历史",
+  "recent_sales": "最近成交",
+  "no_price_data": "暂无价格数据"
+}

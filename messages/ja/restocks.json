@@ -1,0 +1,17 @@
+{
+  "title": "入荷情報トラッカー",
+  "report_restock": "入荷情報を報告",
+  "store_name": "店舗名",
+  "store_address": "住所",
+  "item_found": "見つけたアイテム",
+  "freshness": "新しさ",
+  "verified": "{count}件が確認済み",
+  "verify": "確認",
+  "nearby": "近隣の入荷情報 {count}件",
+  "detect_location": "位置情報を検出",
+  "additional_details": "追加情報",
+  "add_photo": "写真を追加",
+  "empty_state": "あなたのエリアで入荷情報は見つかりません",
+  "map_view": "マップビュー",
+  "list_view": "リストビュー"
+}

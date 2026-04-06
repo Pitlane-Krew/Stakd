@@ -1,0 +1,13 @@
+{
+  "title": "扫描和识别",
+  "camera_scan": "相机扫描",
+  "manual_entry": "手动输入",
+  "photo_ai": "AI照片识别",
+  "scanning": "扫描中...",
+  "point_camera": "指向条形码",
+  "scan_results": "扫描结果",
+  "recent_scans": "最近扫描",
+  "add_to_collection": "加入藏品库",
+  "report_restock": "报告补货",
+  "supported_formats": "支持: EAN-13, UPC-A, QR码, Code 128"
+}

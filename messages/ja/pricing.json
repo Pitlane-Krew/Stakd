@@ -1,0 +1,20 @@
+{
+  "estimated_value": "推定価格",
+  "market_value": "市場価格",
+  "price_trend": "価格推移",
+  "roi": "ROI",
+  "purchased_for": "{amount}で購入",
+  "value_change": "{direction} {percent}% ({period})",
+  "time_ranges": {
+    "7d": "7日",
+    "30d": "30日",
+    "90d": "90日",
+    "1y": "1年",
+    "all": "全期間"
+  },
+  "sources": {
+    "ebay": "eBay",
+    "psa": "PSA",
+    "goldin": "Goldin"
+  }
+}

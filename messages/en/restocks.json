@@ -1,0 +1,17 @@
+{
+  "title": "Restock Tracker",
+  "report_restock": "Report a Restock",
+  "store_name": "Store Name",
+  "store_address": "Store Address",
+  "item_found": "Item Found",
+  "freshness": "Freshness",
+  "verified": "{count} verified",
+  "verify": "Verify",
+  "nearby": "{count} restocks nearby",
+  "detect_location": "Detect Location",
+  "additional_details": "Additional Details",
+  "add_photo": "Add Photo",
+  "empty_state": "No restocks found in your area",
+  "map_view": "Map View",
+  "list_view": "List View"
+}

@@ -1,0 +1,15 @@
+{
+  "feed": "Actividad",
+  "post": "Publicación",
+  "comment": "Comentario",
+  "like": "Me Gusta",
+  "share": "Compartir",
+  "follow": "Seguir",
+  "unfollow": "Dejar de Seguir",
+  "followers": "Seguidores",
+  "following": "Siguiendo",
+  "translate_post": "Traducir publicación",
+  "translate_comment": "Traducir comentario",
+  "translating": "Traduciendo...",
+  "show_original": "Mostrar original"
+}

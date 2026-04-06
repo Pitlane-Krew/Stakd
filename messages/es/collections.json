@@ -1,0 +1,15 @@
+{
+  "title": "Colecciones",
+  "my_collections": "Mis Colecciones",
+  "create_collection": "Crear Colección",
+  "edit_collection": "Editar Colección",
+  "collection_name": "Nombre de la Colección",
+  "description": "Descripción",
+  "category": "Categoría",
+  "public": "Público",
+  "private": "Privado",
+  "item_count": "{count} artículos",
+  "total_value": "Valor Total",
+  "empty_state": "Comienza a construir tu colección",
+  "delete_confirm": "¿Estás seguro de que deseas eliminar esta colección?"
+}

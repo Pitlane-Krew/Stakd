@@ -1,0 +1,15 @@
+{
+  "title": "コレクション",
+  "my_collections": "マイコレクション",
+  "create_collection": "コレクションを作成",
+  "edit_collection": "コレクションを編集",
+  "collection_name": "コレクション名",
+  "description": "説明",
+  "category": "カテゴリー",
+  "public": "公開",
+  "private": "非公開",
+  "item_count": "{count}件のアイテム",
+  "total_value": "総額",
+  "empty_state": "コレクション構築を開始してください",
+  "delete_confirm": "このコレクションを削除してもよろしいですか？"
+}

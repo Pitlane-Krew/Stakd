@@ -1,0 +1,20 @@
+{
+  "estimated_value": "估计价值",
+  "market_value": "市场价值",
+  "price_trend": "价格趋势",
+  "roi": "投资回报率",
+  "purchased_for": "购买价格 {amount}",
+  "value_change": "{direction} {percent}% ({period})",
+  "time_ranges": {
+    "7d": "7天",
+    "30d": "30天",
+    "90d": "90天",
+    "1y": "1年",
+    "all": "全部"
+  },
+  "sources": {
+    "ebay": "eBay",
+    "psa": "PSA",
+    "goldin": "Goldin"
+  }
+}

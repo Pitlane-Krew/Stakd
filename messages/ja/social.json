@@ -1,0 +1,15 @@
+{
+  "feed": "フィード",
+  "post": "投稿",
+  "comment": "コメント",
+  "like": "いいね",
+  "share": "シェア",
+  "follow": "フォロー",
+  "unfollow": "フォローを解除",
+  "followers": "フォロワー",
+  "following": "フォロー中",
+  "translate_post": "投稿を翻訳",
+  "translate_comment": "コメントを翻訳",
+  "translating": "翻訳中...",
+  "show_original": "オリジナルを表示"
+}
