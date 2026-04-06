@@ -21,7 +21,8 @@
     "date-fns": "^4.1.0",
     "zod": "^3.24.0",
     "@ericblade/quagga2": "^1.8.4",
-    "clsx": "^2.1.0"
+    "clsx": "^2.1.0",
+    "html2canvas": "^1.4.1"
   },
   "devDependencies": {
     "typescript": "^5.8.0",
