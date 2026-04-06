@@ -1,13 +1,33 @@
 "use client";
 
-import { type LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  Users,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  CreditCard,
+  ShieldAlert,
+  Activity,
+  Database,
+  type LucideIcon,
+} from "lucide-react";
+
+const iconMap: Record<string, LucideIcon> = {
+  Users,
+  TrendingUp,
+  TrendingDown,
+  CreditCard,
+  ShieldAlert,
+  Activity,
+  Database,
+};
 
 interface Props {
   label: string;
   value: string | number;
-  icon: LucideIcon;
+  iconName: string;
   color?: string;
-  change?: number;    // percentage change vs last period
+  change?: number;
   changeLabel?: string;
   loading?: boolean;
 }
@@ -15,12 +35,14 @@ interface Props {
 export default function StatsCard({
   label,
   value,
-  icon: Icon,
+  iconName,
   color = "var(--color-accent)",
   change,
   changeLabel = "vs last 7d",
   loading,
 }: Props) {
+  const Icon = iconMap[iconName] ?? Activity;
+
   if (loading) {
     return (
       <div className="bg-[#1a1a24] border border-white/10 rounded-xl p-5 animate-pulse">
