@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/cron/freshness",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/prices",
@@ -35,4 +35,4 @@
       "maxDuration": 60
     }
   }
-} 
+}
