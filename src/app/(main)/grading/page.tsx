@@ -5,7 +5,7 @@ import GradeAnalyzer from "@/components/grading/GradeAnalyzer";
 
 export default function GradingPage() {
   return (
-    <div className="max-w-2xl mx-auto space-y-6 p-6">
+    <div className="lg:max-w-2xl lg:mx-auto space-y-6 p-4 lg:p-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-[var(--color-accent)]" />

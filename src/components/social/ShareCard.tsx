@@ -82,7 +82,7 @@ export default function ShareCard({ data, type, milestoneText }: Props) {
         <div className="relative z-10 space-y-4">
           {/* Top bar */}
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-purple-400 tracking-wider">
+            <span className="text-sm font-bold text-[var(--color-accent)] tracking-wider">
               STAKD
             </span>
             <span className="text-xs text-gray-500">
@@ -157,7 +157,7 @@ export default function ShareCard({ data, type, milestoneText }: Props) {
 
           {/* Footer */}
           <div className="flex items-center gap-2 pt-2 border-t border-white/10">
-            <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white">
+            <div className="w-8 h-8 rounded-full bg-[var(--color-accent)] flex items-center justify-center text-xs font-bold text-white">
               {data.displayName[0]?.toUpperCase()}
             </div>
             <div>

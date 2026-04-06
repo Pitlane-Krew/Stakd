@@ -59,7 +59,7 @@ const TOOLS: {
   {
     id: "qr-labels",
     icon: <QrCode className="w-6 h-6" />,
-    color: "text-purple-400",
+    color: "text-[var(--color-accent)]",
     title: "QR Code Labels",
     desc: "Generate scannable labels for your display",
     pro: true,
@@ -70,7 +70,7 @@ export default function ToolsPage() {
   const [activeTool, setActiveTool] = useState<Tool>(null);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <div className="lg:max-w-3xl lg:mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-[var(--color-accent)]" />

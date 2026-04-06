@@ -19,11 +19,11 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
+    <div className="lg:max-w-5xl lg:mx-auto py-6 lg:py-10 space-y-8 lg:space-y-10">
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-bold">Choose Your Plan</h1>
-        <p className="text-[var(--color-text-muted)] max-w-lg mx-auto">
+        <p className="text-[var(--color-text-muted)] lg:max-w-lg lg:mx-auto">
           Start free, upgrade when you need more. Every plan includes core
           collection tracking and community features.
         </p>

@@ -138,7 +138,7 @@ export default function CollectionShowcasePage() {
       {/* ── Profile Hero ── */}
       <div className="relative">
         {/* Banner gradient */}
-        <div className="h-32 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] via-purple-600 to-pink-500 opacity-80" />
+        <div className="h-32 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent-hover)] to-[var(--color-success)] opacity-80" />
 
         {/* Profile card overlapping banner */}
         <div className="relative -mt-16 mx-4">

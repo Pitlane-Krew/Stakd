@@ -78,7 +78,7 @@ export default function MapView({
             el.className = "stakd-map-marker";
             el.style.cssText = `
               width: 20px; height: 20px; border-radius: 50%;
-              background: ${marker.color || "#7c3aed"};
+              background: ${marker.color || "#4B9CD3"};
               border: 2px solid white;
               cursor: pointer;
               box-shadow: 0 2px 6px rgba(0,0,0,0.3);

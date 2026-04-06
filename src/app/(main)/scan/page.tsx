@@ -38,7 +38,7 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="lg:max-w-lg lg:mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Scan className="w-6 h-6 text-[var(--color-accent)]" />

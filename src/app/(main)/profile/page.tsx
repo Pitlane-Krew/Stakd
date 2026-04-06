@@ -49,7 +49,7 @@ export default function ProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="lg:max-w-lg lg:mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Your Profile</h1>
 
       {/* Profile card */}

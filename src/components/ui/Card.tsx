@@ -12,8 +12,8 @@ export default function Card({ children, className, onClick, hover = false }: Ca
     <div
       onClick={onClick}
       className={cn(
-        "rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] card-shadow",
-        hover && "cursor-pointer hover:border-[var(--color-accent)] hover:card-shadow-lg",
+        "rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-card)] card-shadow",
+        hover && "cursor-pointer hover:border-[var(--color-accent)] hover:card-shadow-lg card-interactive",
         className
       )}
     >

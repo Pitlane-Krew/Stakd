@@ -41,7 +41,7 @@ const PLATFORMS: {
   {
     id: "stakd",
     name: "STAKD Marketplace",
-    color: "#7c3aed",
+    color: "#4B9CD3",
     fee: "3%",
     url: "",
   },

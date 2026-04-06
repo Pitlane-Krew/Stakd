@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ─── Dark Theme (default) ─── */
+/* ─── Dark Theme (default) — Carolina Blue core ─── */
 :root,
 :root.dark,
 :root[data-theme="dark"] {
@@ -13,11 +13,14 @@
   --color-text: #fafafa;
   --color-text-secondary: #d4d4d8;
   --color-text-muted: #a1a1aa;
-  --color-accent: #7c3aed;
-  --color-accent-hover: #8b5cf6;
-  --color-accent-subtle: rgba(124, 58, 237, 0.15);
-  --color-success: #10b981;
-  --color-success-subtle: rgba(16, 185, 129, 0.15);
+  --color-accent: #4B9CD3;
+  --color-accent-hover: #7BBFEF;
+  --color-accent-subtle: rgba(75, 156, 211, 0.15);
+  --color-success: #00E071;
+  --color-success-subtle: rgba(0, 224, 113, 0.12);
+  --color-value: #00E071;
+  --color-value-bright: #33FF8E;
+  --color-value-subtle: rgba(0, 224, 113, 0.12);
   --color-warning: #f59e0b;
   --color-warning-subtle: rgba(245, 158, 11, 0.15);
   --color-danger: #ef4444;
@@ -25,7 +28,7 @@
   --color-shadow: rgba(0, 0, 0, 0.4);
 }
 
-/* ─── Light Theme ─── */
+/* ─── Light Theme — Duke Blue core ─── */
 :root.light,
 :root[data-theme="light"] {
   --color-bg: #fafafa;
@@ -37,11 +40,14 @@
   --color-text: #09090b;
   --color-text-secondary: #27272a;
   --color-text-muted: #71717a;
-  --color-accent: #6d28d9;
-  --color-accent-hover: #5b21b6;
-  --color-accent-subtle: rgba(109, 40, 217, 0.08);
-  --color-success: #059669;
-  --color-success-subtle: rgba(5, 150, 105, 0.08);
+  --color-accent: #0033A0;
+  --color-accent-hover: #1A4DBF;
+  --color-accent-subtle: rgba(0, 51, 160, 0.08);
+  --color-success: #00B25A;
+  --color-success-subtle: rgba(0, 178, 90, 0.08);
+  --color-value: #00B25A;
+  --color-value-bright: #00E071;
+  --color-value-subtle: rgba(0, 178, 90, 0.08);
   --color-warning: #d97706;
   --color-warning-subtle: rgba(217, 119, 6, 0.08);
   --color-danger: #dc2626;
@@ -50,6 +56,11 @@
 }
 
 /* ─── Base Styles ─── */
+html {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -57,16 +68,75 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
+  overscroll-behavior-y: contain;
+  /* Safe area handled by individual layout components, NOT body */
 }
 
-/* Smooth theme transitions */
+/* Smooth theme transitions — exclude transform to avoid interfering with animations */
 *,
 *::before,
 *::after {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease, box-shadow 0.2s ease;
 }
 
-/* Scrollbar */
+/* ─── Mobile App-like Behavior ─── */
+
+/* Disable tap highlight and text selection on nav elements only */
+.mobile-tab-bar,
+.mobile-tab-bar *,
+nav a,
+nav button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Touch targets: Use opt-in class instead of blanket rule.
+ * The old rule (min-height: 44px on ALL buttons/links) broke
+ * small UI: badges, pills, inline icons, dot indicators.
+ * Apply .touch-target to buttons that genuinely need it.
+ */
+
+/* Smooth scrolling for page content */
+main {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Bottom Tab Bar Glass Effect ─── */
+.mobile-tab-bar {
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ─── Page Transition Animation ─── */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main > * {
+  animation: page-enter 0.2s ease-out;
+}
+
+/* ─── Card Interactions (mobile press feedback) ─── */
+@media (max-width: 1023px) {
+  .card-interactive {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .card-interactive:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -78,16 +148,84 @@ body {
   border-radius: 3px;
 }
 
-/* Focus ring */
+/* Hide scrollbar on mobile */
+@media (max-width: 1023px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ─── Focus Ring ─── */
 *:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* Card shadow utility */
+/* ─── Card Shadows ─── */
 .card-shadow {
   box-shadow: 0 1px 3px var(--color-shadow), 0 1px 2px var(--color-shadow);
 }
 .card-shadow-lg {
   box-shadow: 0 4px 6px var(--color-shadow), 0 2px 4px var(--color-shadow);
+}
+
+/* ─── Skeleton Loader Shimmer ─── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Modal / Bottom Sheet Animation ─── */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+/* ─── Utility: Gradient Text ─── */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-value {
+  background: linear-gradient(135deg, var(--color-value), var(--color-value-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

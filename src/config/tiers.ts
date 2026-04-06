@@ -102,7 +102,7 @@ export const TIERS: Record<TierLevel, TierDefinition> = {
     tagline: "For serious collectors who want an edge",
     price: 7.99,
     annualPrice: 69.99,
-    color: "#7c3aed",
+    color: "#4B9CD3",
     limits: {
       maxCollections: 25,
       maxItemsPerCollection: 500,

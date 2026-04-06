@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Users,
   Search,
@@ -10,14 +10,12 @@ import {
   Share2,
   ShieldCheck,
   Star,
-  Loader2,
   Package,
   TrendingUp,
   Eye,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { createClient } from "@/lib/supabase/client";
 
 // ---------------------------------------------------------------
 // Types
@@ -49,7 +47,7 @@ interface FeedItem {
 }
 
 // ---------------------------------------------------------------
-// Demo Data (will be replaced by real Supabase queries)
+// Demo Data
 // ---------------------------------------------------------------
 const DEMO_USERS: UserProfile[] = [
   {
@@ -96,7 +94,8 @@ const DEMO_FEED: FeedItem[] = [
     user: { display_name: "SportsVault", username: "sportsvault", avatar_url: null },
     type: "grade",
     title: "PSA 10 came back!",
-    description: "My 2020 Prizm Justin Herbert Silver just came back PSA 10! Population 847.",
+    description:
+      "My 2020 Prizm Justin Herbert Silver just came back PSA 10! Population 847.",
     image_url: null,
     timestamp: "2h ago",
     likes: 24,
@@ -108,7 +107,8 @@ const DEMO_FEED: FeedItem[] = [
     user: { display_name: "CardKing99", username: "cardking99", avatar_url: null },
     type: "new_item",
     title: "Added Charizard VMAX to collection",
-    description: "Finally got the Shining Fates Charizard VMAX. Rainbow rare variant. Estimated at $185.",
+    description:
+      "Finally got the Shining Fates Charizard VMAX. Rainbow rare variant. Estimated at $185.",
     image_url: null,
     timestamp: "4h ago",
     likes: 18,
@@ -120,7 +120,8 @@ const DEMO_FEED: FeedItem[] = [
     user: { display_name: "WheelDealz", username: "wheeldealz", avatar_url: null },
     type: "milestone",
     title: "Hit 300 items!",
-    description: "My Hot Wheels collection just crossed 300 pieces. Started 6 months ago.",
+    description:
+      "My Hot Wheels collection just crossed 300 pieces. Started 6 months ago.",
     image_url: null,
     timestamp: "6h ago",
     likes: 12,
@@ -132,7 +133,8 @@ const DEMO_FEED: FeedItem[] = [
     user: { display_name: "SportsVault", username: "sportsvault", avatar_url: null },
     type: "trade",
     title: "Looking to trade",
-    description: "Have: 2023 Bowman Chrome autos. Want: Prizm NFL parallels. DM if interested.",
+    description:
+      "Have: 2023 Bowman Chrome autos. Want: Prizm NFL parallels. DM if interested.",
     image_url: null,
     timestamp: "8h ago",
     likes: 6,
@@ -151,7 +153,6 @@ export default function FeedPage() {
   const [search, setSearch] = useState("");
   const [feed, setFeed] = useState(DEMO_FEED);
   const [users, setUsers] = useState(DEMO_USERS);
-  const [loading, setLoading] = useState(false);
 
   const filteredUsers = search
     ? users.filter(
@@ -173,7 +174,11 @@ export default function FeedPage() {
     setFeed((prev) =>
       prev.map((f) =>
         f.id === feedId
-          ? { ...f, liked: !f.liked, likes: f.liked ? f.likes - 1 : f.likes + 1 }
+          ? {
+              ...f,
+              liked: !f.liked,
+              likes: f.liked ? f.likes - 1 : f.likes + 1,
+            }
           : f
       )
     );
@@ -181,45 +186,48 @@ export default function FeedPage() {
 
   function getFeedIcon(type: FeedItem["type"]) {
     switch (type) {
-      case "new_item": return <Package className="w-4 h-4 text-[var(--color-accent)]" />;
-      case "grade": return <Star className="w-4 h-4 text-amber-400" />;
-      case "trade": return <Share2 className="w-4 h-4 text-emerald-400" />;
-      case "milestone": return <TrendingUp className="w-4 h-4 text-pink-400" />;
-      default: return <Package className="w-4 h-4" />;
+      case "new_item":
+        return <Package className="w-3.5 h-3.5 text-[var(--color-accent)]" />;
+      case "grade":
+        return <Star className="w-3.5 h-3.5 text-amber-400" />;
+      case "trade":
+        return <Share2 className="w-3.5 h-3.5 text-emerald-400" />;
+      case "milestone":
+        return <TrendingUp className="w-3.5 h-3.5 text-pink-400" />;
+      default:
+        return <Package className="w-3.5 h-3.5" />;
     }
   }
 
   function getInitials(name: string) {
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">Community</h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-1">
-          Connect with collectors, share finds, and trade with trust
-        </p>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl bg-[var(--color-bg-elevated)]">
-        {([
-          { id: "feed" as const, label: "Feed", icon: Users },
-          { id: "discover" as const, label: "Discover", icon: Search },
-          { id: "friends" as const, label: "Friends", icon: Heart },
-        ]).map(({ id, label, icon: Icon }) => (
+    <div className="lg:max-w-2xl lg:mx-auto space-y-5">
+      {/* Tabs — pill style like Instagram/Twitter */}
+      <div className="flex gap-1 p-1 rounded-2xl bg-[var(--color-bg-elevated)]">
+        {(
+          [
+            { id: "feed" as const, label: "Feed" },
+            { id: "discover" as const, label: "Discover" },
+            { id: "friends" as const, label: "Following" },
+          ] as const
+        ).map(({ id, label }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-[0.97] ${
               tab === id
                 ? "bg-[var(--color-bg-card)] text-[var(--color-text)] shadow-sm"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                : "text-[var(--color-text-muted)]"
             }`}
           >
-            <Icon className="w-4 h-4" />
             {label}
           </button>
         ))}
@@ -227,18 +235,20 @@ export default function FeedPage() {
 
       {/* ── Feed Tab ── */}
       {tab === "feed" && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {feed.length === 0 ? (
-            <div className="text-center py-16">
-              <Users className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-3" />
-              <p className="text-[var(--color-text-muted)]">Your feed is empty</p>
-              <p className="text-xs text-[var(--color-text-muted)] mt-1">
-                Follow other collectors to see their activity here
+            <div className="text-center py-16 px-6">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-accent-subtle)] flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-[var(--color-accent)]" />
+              </div>
+              <h3 className="font-bold mb-1">Your feed is empty</h3>
+              <p className="text-xs text-[var(--color-text-muted)] mb-4">
+                Follow collectors to see their activity
               </p>
               <Button
                 variant="secondary"
                 size="sm"
-                className="mt-4"
+                className="rounded-xl"
                 onClick={() => setTab("discover")}
               >
                 Discover Collectors
@@ -246,55 +256,68 @@ export default function FeedPage() {
             </div>
           ) : (
             feed.map((item) => (
-              <Card key={item.id} className="p-4 space-y-3">
+              <div
+                key={item.id}
+                className="p-4 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] space-y-3"
+              >
                 {/* User row */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-sm font-bold text-[var(--color-accent)]">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-xs font-bold text-[var(--color-accent)] shrink-0">
                     {getInitials(item.user.display_name)}
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold">{item.user.display_name}</p>
-                    <p className="text-xs text-[var(--color-text-muted)] flex items-center gap-1.5">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold truncate">
+                        {item.user.display_name}
+                      </p>
+                      <span className="text-[10px] text-[var(--color-text-muted)]">
+                        {item.timestamp}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-[var(--color-text-muted)]">
                       {getFeedIcon(item.type)}
-                      {item.timestamp}
-                    </p>
+                      <span className="capitalize">{item.type.replace("_", " ")}</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div>
-                  <p className="text-sm font-medium">{item.title}</p>
-                  <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                  <p className="text-sm font-semibold">{item.title}</p>
+                  <p className="text-sm text-[var(--color-text-muted)] mt-1 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-4 pt-1">
+                {/* Actions — spaced like social apps */}
+                <div className="flex items-center gap-1 pt-1 -mx-1">
                   <button
                     onClick={() => toggleLike(item.id)}
-                    className={`flex items-center gap-1.5 text-sm transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm transition-all active:scale-95 ${
                       item.liked
                         ? "text-red-400"
-                        : "text-[var(--color-text-muted)] hover:text-red-400"
+                        : "text-[var(--color-text-muted)]"
                     }`}
                   >
                     <Heart
-                      className="w-4 h-4"
+                      className="w-[18px] h-[18px]"
                       fill={item.liked ? "currentColor" : "none"}
                     />
-                    {item.likes}
+                    <span className="text-xs font-medium tabular-nums">
+                      {item.likes}
+                    </span>
                   </button>
-                  <button className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
-                    <MessageCircle className="w-4 h-4" />
-                    {item.comments}
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-[var(--color-text-muted)] active:scale-95 transition-all">
+                    <MessageCircle className="w-[18px] h-[18px]" />
+                    <span className="text-xs font-medium tabular-nums">
+                      {item.comments}
+                    </span>
                   </button>
-                  <button className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
-                    <Share2 className="w-4 h-4" />
-                    Share
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-[var(--color-text-muted)] active:scale-95 transition-all ml-auto">
+                    <Share2 className="w-[18px] h-[18px]" />
                   </button>
                 </div>
-              </Card>
+              </div>
             ))
           )}
         </div>
@@ -305,81 +328,75 @@ export default function FeedPage() {
         <div className="space-y-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search collectors by name or username..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-              autoFocus
+              placeholder="Search collectors..."
+              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
             />
           </div>
 
-          {/* User cards */}
+          {/* User cards — mobile-optimized stack */}
           <div className="space-y-3">
             {filteredUsers.map((user) => (
-              <Card key={user.id} className="p-4">
-                <div className="flex items-start gap-4">
+              <div
+                key={user.id}
+                className="p-4 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] card-interactive"
+              >
+                <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="w-14 h-14 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-lg font-bold text-[var(--color-accent)] flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-sm font-bold text-[var(--color-accent)] shrink-0">
                     {getInitials(user.display_name)}
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold">{user.display_name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-bold text-sm truncate">
+                        {user.display_name}
+                      </p>
                       {user.auth_reputation >= 90 && (
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                       )}
                     </div>
                     <p className="text-xs text-[var(--color-text-muted)]">
                       @{user.username}
                     </p>
                     {user.bio && (
-                      <p className="text-sm text-[var(--color-text-secondary)] mt-1.5">
+                      <p className="text-xs text-[var(--color-text-secondary)] mt-1.5 line-clamp-2 leading-relaxed">
                         {user.bio}
                       </p>
                     )}
-                    {/* Stats */}
-                    <div className="flex items-center gap-4 mt-2.5 text-xs text-[var(--color-text-muted)]">
-                      <span className="flex items-center gap-1">
-                        <Package className="w-3.5 h-3.5" />
+
+                    {/* Stats row */}
+                    <div className="flex items-center gap-3 mt-2.5">
+                      <span className="text-[11px] text-[var(--color-text-muted)] font-medium">
                         {user.item_count.toLocaleString()} items
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5" />
-                        {user.collection_count} collections
+                      <span className="text-[11px] text-[var(--color-text-muted)]">
+                        &middot;
                       </span>
-                      <span className="flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" />
+                      <span className="text-[11px] text-[var(--color-success)] font-bold">
                         ${user.total_value.toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  {/* Follow / View */}
-                  <div className="flex flex-col gap-2 flex-shrink-0">
-                    <Button
-                      size="sm"
-                      variant={user.is_following ? "secondary" : "primary"}
-                      onClick={() => toggleFollow(user.id)}
-                    >
-                      {user.is_following ? (
-                        <>Following</>
-                      ) : (
-                        <>
-                          <UserPlus className="w-3.5 h-3.5" /> Follow
-                        </>
-                      )}
-                    </Button>
-                    <Button size="sm" variant="ghost">
-                      <Eye className="w-3.5 h-3.5" /> View
-                    </Button>
-                  </div>
+                  {/* Follow button */}
+                  <button
+                    onClick={() => toggleFollow(user.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 shrink-0 ${
+                      user.is_following
+                        ? "bg-[var(--color-bg-elevated)] text-[var(--color-text-muted)]"
+                        : "bg-[var(--color-accent)] text-white"
+                    }`}
+                  >
+                    {user.is_following ? "Following" : "Follow"}
+                  </button>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -387,17 +404,20 @@ export default function FeedPage() {
 
       {/* ── Friends Tab ── */}
       {tab === "friends" && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {users.filter((u) => u.is_following).length === 0 ? (
-            <div className="text-center py-16">
-              <Heart className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-3" />
-              <p className="text-[var(--color-text-muted)]">
-                You&apos;re not following anyone yet
+            <div className="text-center py-16 px-6">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-accent-subtle)] flex items-center justify-center mb-4">
+                <Heart className="w-8 h-8 text-[var(--color-accent)]" />
+              </div>
+              <h3 className="font-bold mb-1">Not following anyone yet</h3>
+              <p className="text-xs text-[var(--color-text-muted)] mb-4">
+                Discover and follow collectors to build your network
               </p>
               <Button
                 variant="secondary"
                 size="sm"
-                className="mt-4"
+                className="rounded-xl"
                 onClick={() => setTab("discover")}
               >
                 Find Collectors
@@ -407,33 +427,31 @@ export default function FeedPage() {
             users
               .filter((u) => u.is_following)
               .map((user) => (
-                <Card key={user.id} className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-sm font-bold text-[var(--color-accent)]">
-                      {getInitials(user.display_name)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold">{user.display_name}</p>
-                        {user.auth_reputation >= 90 && (
-                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                        )}
-                      </div>
-                      <p className="text-xs text-[var(--color-text-muted)]">
-                        {user.item_count.toLocaleString()} items · $
-                        {user.total_value.toLocaleString()} value
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="secondary">
-                        <Eye className="w-3.5 h-3.5" /> Collection
-                      </Button>
-                      <Button size="sm" variant="ghost">
-                        <Share2 className="w-3.5 h-3.5" /> Trade
-                      </Button>
-                    </div>
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] card-interactive"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-sm font-bold text-[var(--color-accent)] shrink-0">
+                    {getInitials(user.display_name)}
                   </div>
-                </Card>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-bold text-sm truncate">
+                        {user.display_name}
+                      </p>
+                      {user.auth_reputation >= 90 && (
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[var(--color-text-muted)]">
+                      {user.item_count.toLocaleString()} items &middot; $
+                      {user.total_value.toLocaleString()}
+                    </p>
+                  </div>
+                  <button className="p-2.5 rounded-xl bg-[var(--color-bg-elevated)] active:scale-95 transition-all">
+                    <Eye className="w-4 h-4 text-[var(--color-text-muted)]" />
+                  </button>
+                </div>
               ))
           )}
         </div>
