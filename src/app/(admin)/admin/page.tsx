@@ -88,7 +88,7 @@ export default async function AdminDashboardPage() {
             >
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm font-medium">
-                Price source "{s.source_name}" has errors — {s.last_error ?? "check configuration"}
+                Price source &quot;{s.source_name}&quot; has errors — {s.last_error ?? "check configuration"}
               </span>
             </Link>
           ))}
@@ -100,26 +100,26 @@ export default async function AdminDashboardPage() {
         <StatsCard
           label="Total Users"
           value={stats.totalUsers.toLocaleString()}
-          icon={Users}
+          iconName="Users"
           color="#7c3aed"
           change={stats.userGrowth ?? undefined}
         />
         <StatsCard
           label="New This Week"
           value={stats.newUsersThisWeek}
-          icon={TrendingUp}
+          iconName="TrendingUp"
           color="#10b981"
         />
         <StatsCard
           label="Paid Members"
           value={stats.activeSubs}
-          icon={CreditCard}
+          iconName="CreditCard"
           color="#f59e0b"
         />
         <StatsCard
           label="Open Reports"
           value={stats.openReports}
-          icon={ShieldAlert}
+          iconName="ShieldAlert"
           color={stats.openReports > 0 ? "#ef4444" : "#6b7280"}
         />
       </div>
@@ -211,22 +211,26 @@ export default async function AdminDashboardPage() {
       {/* Quick links */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { href: "/admin/users", label: "Manage Users", icon: Users },
-          { href: "/admin/moderation", label: "Moderation Queue", icon: ShieldAlert },
-          { href: "/admin/memberships", label: "Memberships", icon: CreditCard },
-          { href: "/admin/logs", label: "Audit Logs", icon: Activity },
-        ].map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex flex-col items-center gap-2 p-4 bg-[#1a1a24] border border-white/10 rounded-xl hover:border-white/20 transition-colors text-center group"
-          >
-            <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors" />
-            <span className="text-xs text-white/60 group-hover:text-white/90 transition-colors font-medium">
-              {label}
-            </span>
-          </Link>
-        ))}
+          { href: "/admin/users", label: "Manage Users", iconName: "Users" },
+          { href: "/admin/moderation", label: "Moderation Queue", iconName: "ShieldAlert" },
+          { href: "/admin/memberships", label: "Memberships", iconName: "CreditCard" },
+          { href: "/admin/logs", label: "Audit Logs", iconName: "Activity" },
+        ].map(({ href, label, iconName }) => {
+          const IconMap: Record<string, typeof Users> = { Users, ShieldAlert, CreditCard, Activity };
+          const Icon = IconMap[iconName] ?? Activity;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="flex flex-col items-center gap-2 p-4 bg-[#1a1a24] border border-white/10 rounded-xl hover:border-white/20 transition-colors text-center group"
+            >
+              <Icon className="w-5 h-5 text-white/40 group-hover:text-white/70 transition-colors" />
+              <span className="text-xs text-white/60 group-hover:text-white/90 transition-colors font-medium">
+                {label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
