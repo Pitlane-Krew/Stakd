@@ -100,8 +100,8 @@ export const TIERS: Record<TierLevel, TierDefinition> = {
     id: "pro",
     name: "Pro",
     tagline: "For serious collectors who want an edge",
-    price: 7.99,
-    annualPrice: 69.99,
+    price: 5.99,
+    annualPrice: 49.99,
     color: "#4B9CD3",
     limits: {
       maxCollections: 25,
@@ -140,8 +140,8 @@ export const TIERS: Record<TierLevel, TierDefinition> = {
     id: "elite",
     name: "Elite",
     tagline: "Unlimited power for top-tier collectors",
-    price: 14.99,
-    annualPrice: 129.99,
+    price: 9.99,
+    annualPrice: 79.99,
     color: "#f59e0b",
     limits: {
       maxCollections: -1,

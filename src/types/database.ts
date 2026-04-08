@@ -36,6 +36,17 @@ export interface Database {
           ban_reason: string | null;
           last_sign_in_at: string | null;
           flagged_count: number;
+          // Migration 023: Stripe billing columns
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          // Migration 024: Email preferences
+          email_preferences: {
+            marketing: boolean;
+            price_alerts: boolean;
+            trade_updates: boolean;
+            weekly_digest: boolean;
+          };
+          email_verified: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -48,6 +59,13 @@ export interface Database {
           location?: string | null;
           is_public?: boolean;
           tier?: "free" | "pro" | "elite";
+          email_preferences?: {
+            marketing: boolean;
+            price_alerts: boolean;
+            trade_updates: boolean;
+            weekly_digest: boolean;
+          };
+          email_verified?: boolean;
         };
         Update: {
           username?: string;
@@ -57,6 +75,16 @@ export interface Database {
           location?: string | null;
           is_public?: boolean;
           tier?: "free" | "pro" | "elite";
+          tier_expires_at?: string | null;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          email_preferences?: {
+            marketing: boolean;
+            price_alerts: boolean;
+            trade_updates: boolean;
+            weekly_digest: boolean;
+          };
+          email_verified?: boolean;
         };
         Relationships: [];
       };

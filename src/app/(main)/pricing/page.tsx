@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, Sparkles, Crown, Zap } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Check, X, Sparkles, Crown, Zap, Loader2 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { TIERS, type TierLevel } from "@/config/tiers";
@@ -9,7 +10,13 @@ import { useTier } from "@/hooks/useTier";
 
 export default function PricingPage() {
   const [annual, setAnnual] = useState(true);
+  const [loading, setLoading] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { tier: currentTier } = useTier();
+
+  const showSuccess = searchParams.get("success") === "true";
+  const showCancelled = searchParams.get("cancelled") === "true";
 
   const tierOrder: TierLevel[] = ["free", "pro", "elite"];
   const icons: Record<TierLevel, React.ReactNode> = {
@@ -18,8 +25,73 @@ export default function PricingPage() {
     elite: <Crown className="w-6 h-6" />,
   };
 
+  const handleUpgrade = async (tierId: TierLevel) => {
+    if (tierId === "free") return;
+
+    try {
+      setLoading(tierId);
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: tierId, annual }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to start checkout");
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert(error instanceof Error ? error.message : "Failed to start checkout");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      setLoading("portal");
+      const response = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to open subscription portal");
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Portal error:", error);
+      alert(error instanceof Error ? error.message : "Failed to open subscription portal");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="lg:max-w-5xl lg:mx-auto py-6 lg:py-10 space-y-8 lg:space-y-10">
+      {/* Success/Error alerts */}
+      {showSuccess && (
+        <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm">
+          Payment successful! Your subscription is now active.
+        </div>
+      )}
+      {showCancelled && (
+        <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 text-sm">
+          Checkout cancelled. Your plan has not been changed.
+        </div>
+      )}
+
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-bold">Choose Your Plan</h1>
@@ -50,7 +122,7 @@ export default function PricingPage() {
           >
             Annual
             <span className="ml-1.5 text-xs text-emerald-400 font-semibold">
-              Save 27%
+              Save 28%
             </span>
           </button>
         </div>
@@ -145,8 +217,19 @@ export default function PricingPage() {
 
               {/* CTA */}
               {isCurrent ? (
-                <Button variant="secondary" className="w-full" disabled>
-                  Current Plan
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={handleManageSubscription}
+                  disabled={loading === "portal"}
+                >
+                  {loading === "portal" ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+                    </>
+                  ) : (
+                    "Manage Subscription"
+                  )}
                 </Button>
               ) : id === "free" ? (
                 <Button variant="secondary" className="w-full">
@@ -160,8 +243,18 @@ export default function PricingPage() {
                       ? {}
                       : { backgroundColor: t.color }
                   }
+                  onClick={() => handleUpgrade(id)}
+                  disabled={loading === id}
                 >
-                  <Sparkles className="w-4 h-4" /> Upgrade to {t.name}
+                  {loading === id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" /> Upgrade to {t.name}
+                    </>
+                  )}
                 </Button>
               )}
             </Card>

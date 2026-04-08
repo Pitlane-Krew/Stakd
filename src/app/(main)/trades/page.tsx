@@ -1,18 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeftRight, Search, Inbox, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeftRight, Search, Inbox, Clock, CheckCircle, XCircle, MessageSquare, Zap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRealtimeTrades } from "@/hooks/useRealtimeTrades";
+import { useTradePresence } from "@/hooks/useTradePresence";
 import { createClient } from "@/lib/supabase/client";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
+import { useToast } from "@/components/ui/Toast";
 import ReputationBadge from "@/components/trade/ReputationBadge";
 import TradeProposal from "@/components/trade/TradeProposal";
+import TradeChat from "@/components/trade/TradeChat";
 import { CATEGORIES } from "@/config/constants";
 import { formatCurrency } from "@/lib/utils";
 import type { Item, Trade } from "@/types/database";
-import type { Database } from "@/types/database";
 
 interface TradeableItem extends Item {
   profiles?: {
@@ -24,17 +27,62 @@ interface TradeableItem extends Item {
   };
 }
 
+interface TradeWithProfiles extends Trade {
+  initiator_profile?: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    reputation_score?: number;
+  };
+  receiver_profile?: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    reputation_score?: number;
+  };
+}
+
 type Tab = "browse" | "incoming" | "outgoing" | "history";
 
 export default function TradesPage() {
   const { user } = useAuth();
+  const toast = useToast();
   const [tab, setTab] = useState<Tab>("browse");
   const [tradeItems, setTradeItems] = useState<TradeableItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedItem, setSelectedItem] = useState<TradeableItem | null>(null);
+  const [selectedTrade, setSelectedTrade] = useState<TradeWithProfiles | null>(null);
+  const [showChat, setShowChat] = useState(false);
   const supabase = createClient();
+
+  // Real-time trades hook
+  const {
+    trades: allTrades,
+    incomingCount,
+    outgoingCount,
+    loading: tradesLoading,
+    error: tradesError
+  } = useRealtimeTrades(user?.id);
+
+  // Track presence in current trade
+  const { onlineUsers, isOnline } = useTradePresence(
+    selectedTrade?.id,
+    user?.id
+  );
+
+  // Track new incoming trades with toast notification
+  useEffect(() => {
+    const incomingTrades = allTrades.filter(
+      (t) => t.receiver_id === user?.id && ["pending", "accepted"].includes(t.status)
+    );
+
+    if (incomingTrades.length > incomingCount && incomingCount > 0) {
+      const newTrade = incomingTrades[0];
+      toast.info(`New trade proposal from ${newTrade.id.slice(0, 8)}`);
+    }
+  }, [incomingCount, allTrades, user?.id, toast]);
 
   useEffect(() => {
     loadTradeItems();
@@ -63,32 +111,43 @@ export default function TradesPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
+  const tabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: "browse", label: "Browse", icon: Search },
-    { id: "incoming", label: "Incoming", icon: Inbox },
-    { id: "outgoing", label: "Outgoing", icon: Clock },
+    { id: "incoming", label: "Incoming", icon: Inbox, badge: incomingCount },
+    { id: "outgoing", label: "Outgoing", icon: Clock, badge: outgoingCount },
     { id: "history", label: "History", icon: CheckCircle },
   ];
 
   return (
     <div className="space-y-6">
+      {/* Render toast notifications */}
+      {toast.render()}
+
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <ArrowLeftRight className="w-6 h-6 text-[var(--color-accent)]" />
-          Trade Center
-        </h1>
-        <p className="text-sm text-[var(--color-text-muted)] mt-1">
-          Trade with trusted collectors — every trade builds your reputation
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <ArrowLeftRight className="w-6 h-6 text-[var(--color-accent)]" />
+              Trade Center
+            </h1>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+              Trade with trusted collectors — every trade builds your reputation
+            </p>
+          </div>
+          <div className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <Zap className="w-4 h-4 text-[var(--color-success)] animate-pulse" />
+            <span className="text-xs text-[var(--color-text-muted)]">Live</span>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-xl bg-[var(--color-bg-elevated)]">
-        {tabs.map(({ id, label, icon: Icon }) => (
+        {tabs.map(({ id, label, icon: Icon, badge }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all relative ${
               tab === id
                 ? "bg-[var(--color-bg-card)] text-[var(--color-text)] shadow-sm"
                 : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
@@ -96,6 +155,11 @@ export default function TradesPage() {
           >
             <Icon className="w-4 h-4" />
             {label}
+            {badge !== undefined && badge > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[var(--color-accent)] rounded-full">
+                {badge}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -145,8 +209,7 @@ export default function TradesPage() {
                 No items available for trade
               </p>
               <p className="text-xs text-[var(--color-text-muted)] mt-2">
-                Mark your items as &quot;available for trade&quot; to start
-                matching
+                Mark your items as "available for trade" to start matching
               </p>
             </div>
           ) : (
@@ -210,17 +273,40 @@ export default function TradesPage() {
 
       {/* Incoming tab */}
       {tab === "incoming" && (
-        <TradesList userId={user?.id} type="incoming" />
+        <TradesList
+          userId={user?.id}
+          type="incoming"
+          trades={allTrades}
+          loading={tradesLoading}
+          onSelectTrade={(trade) => {
+            setSelectedTrade(trade as TradeWithProfiles);
+            setShowChat(true);
+          }}
+        />
       )}
 
       {/* Outgoing tab */}
       {tab === "outgoing" && (
-        <TradesList userId={user?.id} type="outgoing" />
+        <TradesList
+          userId={user?.id}
+          type="outgoing"
+          trades={allTrades}
+          loading={tradesLoading}
+          onSelectTrade={(trade) => {
+            setSelectedTrade(trade as TradeWithProfiles);
+            setShowChat(true);
+          }}
+        />
       )}
 
       {/* History tab */}
       {tab === "history" && (
-        <TradesList userId={user?.id} type="history" />
+        <TradesList
+          userId={user?.id}
+          type="history"
+          trades={allTrades}
+          loading={tradesLoading}
+        />
       )}
 
       {/* Trade Proposal Modal */}
@@ -238,6 +324,29 @@ export default function TradesPage() {
           />
         </Modal>
       )}
+
+      {/* Trade Chat Modal */}
+      {selectedTrade && user && (
+        <Modal
+          open={showChat}
+          onClose={() => {
+            setShowChat(false);
+            setSelectedTrade(null);
+          }}
+          title={`Trade ${selectedTrade.id.slice(0, 8)}`}
+          size="lg"
+        >
+          <TradeChat
+            tradeId={selectedTrade.id}
+            otherUserId={selectedTrade.initiator_id === user.id ? selectedTrade.receiver_id : selectedTrade.initiator_id}
+            otherUsername={
+              selectedTrade.initiator_id === user.id
+                ? selectedTrade.receiver_profile?.username || "User"
+                : selectedTrade.initiator_profile?.username || "User"
+            }
+          />
+        </Modal>
+      )}
     </div>
   );
 }
@@ -248,37 +357,31 @@ export default function TradesPage() {
 function TradesList({
   userId,
   type,
+  trades,
+  loading: initialLoading,
+  onSelectTrade,
 }: {
   userId?: string;
   type: "incoming" | "outgoing" | "history";
+  trades: Trade[];
+  loading: boolean;
+  onSelectTrade?: (trade: Trade) => void;
 }) {
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
-  useEffect(() => {
-    if (!userId) return;
-    loadTrades();
-  }, [userId, type]);
-
-  async function loadTrades() {
-    setLoading(true);
-    let query = supabase.from("trades").select("*");
-
+  // Filter trades by type
+  const filteredTrades = trades.filter((t) => {
     if (type === "incoming") {
-      query = query.eq("receiver_id", userId!).in("status", ["pending", "accepted"]);
+      return t.receiver_id === userId && ["pending", "accepted"].includes(t.status);
     } else if (type === "outgoing") {
-      query = query.eq("initiator_id", userId!).in("status", ["pending", "accepted"]);
+      return t.initiator_id === userId && ["pending", "accepted"].includes(t.status);
     } else {
-      query = query
-        .or(`initiator_id.eq.${userId},receiver_id.eq.${userId}`)
-        .in("status", ["completed", "declined", "cancelled", "disputed"]);
+      return (
+        (t.initiator_id === userId || t.receiver_id === userId) &&
+        ["completed", "declined", "cancelled", "disputed"].includes(t.status)
+      );
     }
-
-    const { data } = await query.order("created_at", { ascending: false }).limit(20);
-    setTrades((data as Trade[]) ?? []);
-    setLoading(false);
-  }
+  });
 
   const statusColors: Record<string, string> = {
     pending: "text-amber-400",
@@ -297,7 +400,7 @@ function TradesList({
     );
   }
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
@@ -307,7 +410,7 @@ function TradesList({
     );
   }
 
-  if (trades.length === 0) {
+  if (filteredTrades.length === 0) {
     const emptyMessages = {
       incoming: "No incoming trade proposals",
       outgoing: "You haven't sent any trade proposals",
@@ -323,11 +426,11 @@ function TradesList({
 
   return (
     <div className="space-y-3">
-      {trades.map((trade) => (
+      {filteredTrades.map((trade) => (
         <Card key={trade.id} className="p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <ArrowLeftRight className="w-5 h-5 text-[var(--color-accent)]" />
+            <div className="flex items-center gap-3 flex-1">
+              <ArrowLeftRight className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium">
                   Trade #{trade.id.slice(0, 8)}
@@ -345,16 +448,27 @@ function TradesList({
               >
                 {trade.status}
               </span>
-              {type === "incoming" && trade.status === "pending" && (
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => updateTradeStatus(trade.id, "accepted")}>
-                    Accept
+              <div className="flex gap-2">
+                {(type === "incoming" || type === "outgoing") && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onSelectTrade?.(trade)}
+                  >
+                    <MessageSquare className="w-3 h-3" /> Chat
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => updateTradeStatus(trade.id, "declined")}>
-                    Decline
-                  </Button>
-                </div>
-              )}
+                )}
+                {type === "incoming" && trade.status === "pending" && (
+                  <>
+                    <Button size="sm" onClick={() => updateTradeStatus(trade.id, "accepted", supabase)}>
+                      Accept
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => updateTradeStatus(trade.id, "declined", supabase)}>
+                      Decline
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           {trade.message && (
@@ -366,10 +480,13 @@ function TradesList({
       ))}
     </div>
   );
+}
 
-  async function updateTradeStatus(tradeId: string, status: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await supabase.from("trades").update({ status } as any).eq("id", tradeId);
-    loadTrades();
-  }
+async function updateTradeStatus(
+  tradeId: string,
+  status: string,
+  supabase: ReturnType<typeof createClient>
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await supabase.from("trades").update({ status } as any).eq("id", tradeId);
 }

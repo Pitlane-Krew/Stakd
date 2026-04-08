@@ -26,6 +26,8 @@
   --color-warning-subtle: rgba(245, 158, 11, 0.15);
   --color-danger: #ef4444;
   --color-danger-subtle: rgba(239, 68, 68, 0.15);
+  --color-info: #06B6D4;
+  --color-info-subtle: rgba(6, 182, 212, 0.15);
   --color-shadow: rgba(0, 0, 0, 0.4);
 
   /* Category accent colors */
@@ -64,6 +66,8 @@
   --color-warning-subtle: rgba(217, 119, 6, 0.08);
   --color-danger: #dc2626;
   --color-danger-subtle: rgba(220, 38, 38, 0.08);
+  --color-info: #0891b2;
+  --color-info-subtle: rgba(8, 145, 178, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.08);
 
   /* Category accent colors */
@@ -142,6 +146,18 @@ main {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ─── Toast Slide In Animation ─── */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

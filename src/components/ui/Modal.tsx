@@ -8,10 +8,17 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  size?: "sm" | "md" | "lg";
 }
 
-export default function Modal({ open, onClose, title, children }: ModalProps) {
+export default function Modal({ open, onClose, title, children, size = "md" }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  const sizeClasses = {
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+  };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -37,7 +44,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
       className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end lg:items-center justify-center"
     >
       {/* Bottom sheet on mobile, centered modal on desktop */}
-      <div className="w-full max-w-md bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-t-3xl lg:rounded-2xl card-shadow-lg max-h-[85vh] flex flex-col animate-[slide-up_0.25s_ease-out]">
+      <div className={`w-full ${sizeClasses[size]} bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-t-3xl lg:rounded-2xl card-shadow-lg max-h-[85vh] flex flex-col animate-[slide-up_0.25s_ease-out]`}>
         {/* Mobile drag handle */}
         <div className="lg:hidden flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-[var(--color-border)]" />
