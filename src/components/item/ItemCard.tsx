@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeftRight, DollarSign } from "lucide-react";
 import Card from "@/components/ui/Card";
+import CatalogImage from "./CatalogImage";
 import CategoryAttributes from "./CategoryAttributes";
 import { formatCurrency } from "@/lib/utils";
 import type { Item } from "@/types/database";
@@ -15,17 +16,15 @@ export default function ItemCard({ item }: Props) {
   return (
     <Link href={`/item/${item.id}`}>
       <Card hover className="overflow-hidden">
-        {/* Image */}
-        <div className="aspect-square bg-[var(--color-bg-elevated)] flex items-center justify-center relative">
-          {item.image_urls?.[0] ? (
-            <img
-              src={item.image_urls[0]}
-              alt={item.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="text-[var(--color-text-muted)] text-xs">No image</div>
-          )}
+        {/* Image — uses catalog lookup when no user photo */}
+        <div className="relative">
+          <CatalogImage
+            imageUrls={item.image_urls ?? []}
+            title={item.title}
+            category={item.category}
+            attributes={(item.attributes as Record<string, unknown>) ?? {}}
+            aspectClass="aspect-square"
+          />
 
           {/* Badges */}
           <div className="absolute top-2 right-2 flex flex-col gap-1">

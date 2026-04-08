@@ -8,6 +8,7 @@ import DynamicAttributeForm from "./DynamicAttributeForm";
 import { CONDITIONS, GRADING_COMPANIES } from "@/config/constants";
 import { getCategory, validateAttributes } from "@/config/category-registry";
 import { createItem } from "@/services/collections";
+import { logActivity } from "@/services/social";
 
 interface Props {
   userId: string;
@@ -51,7 +52,7 @@ export default function ItemForm({ userId, collectionId, collectionCategory, onC
     setError(null);
 
     try {
-      await createItem({
+      const newItem = await createItem({
         collection_id: collectionId,
         user_id: userId,
         title: title.trim(),
@@ -68,6 +69,22 @@ export default function ItemForm({ userId, collectionId, collectionCategory, onC
         is_for_sale: isForSale,
         attributes,
       });
+
+      // Post to feed so followers see the new addition
+      await logActivity({
+        user_id: userId,
+        activity_type: "item_added",
+        entity_id: newItem.id,
+        entity_type: "item",
+        metadata: {
+          title: title.trim(),
+          category: collectionCategory,
+          condition,
+          image_url: images[0] ?? null,
+          estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
+        },
+      }).catch(() => {}); // Non-blocking — don't fail the add if feed post fails
+
       onCreated();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

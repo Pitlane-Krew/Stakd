@@ -8,9 +8,11 @@ import {
   ArrowLeftRight,
   ExternalLink,
   Eye,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTier } from "@/hooks/useTier";
+import { useAdmin } from "@/hooks/useAdmin";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -21,6 +23,7 @@ import type { Database } from "@/types/database";
 export default function ProfilePage() {
   const { user, profile, refreshProfile } = useAuth();
   const { tierDef, isPaid } = useTier();
+  const { isAdmin, adminRole } = useAdmin();
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [bio, setBio] = useState(profile?.bio || "");
@@ -209,6 +212,34 @@ export default function ProfilePage() {
           </p>
         )}
       </Card>
+
+      {/* Admin Panel Access */}
+      {isAdmin && (
+        <Card className="p-5 space-y-4">
+          <h2 className="text-sm font-semibold flex items-center gap-2">
+            <Settings className="w-4 h-4 text-orange-400" />
+            Admin Panel
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm">
+                Role:{" "}
+                <span className="font-semibold capitalize text-orange-400">
+                  {adminRole?.replace("_", " ")}
+                </span>
+              </p>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                Manage users, moderation, analytics & settings
+              </p>
+            </div>
+            <Link href="/admin">
+              <Button size="sm" variant="secondary">
+                <Settings className="w-3.5 h-3.5" /> Open Panel
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

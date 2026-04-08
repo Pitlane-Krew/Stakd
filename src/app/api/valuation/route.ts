@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getMarketPrice } from "@/services/pricing";
 
 /**
  * Valuation API proxy.
@@ -125,7 +126,42 @@ async function fetchExternalPrices(
 ): Promise<ExternalSale[]> {
   const sales: ExternalSale[] = [];
 
-  // eBay Finding API
+  // ── Free TCG API prices (Pokémon, Yu-Gi-Oh) ──
+  // Always try these first — no API key needed
+  if (_category === "pokemon") {
+    try {
+      const tcgResult = await getMarketPrice(_category, query);
+      if (tcgResult.marketPrice) {
+        sales.push({
+          price: tcgResult.marketPrice,
+          source: `TCG:${tcgResult.source}`,
+          sale_date: tcgResult.updatedAt,
+          listing_url: null,
+        });
+        // Add low/high as separate data points for better estimates
+        if (tcgResult.lowPrice) {
+          sales.push({
+            price: tcgResult.lowPrice,
+            source: `TCG:${tcgResult.source}:low`,
+            sale_date: tcgResult.updatedAt,
+            listing_url: null,
+          });
+        }
+        if (tcgResult.highPrice) {
+          sales.push({
+            price: tcgResult.highPrice,
+            source: `TCG:${tcgResult.source}:high`,
+            sale_date: tcgResult.updatedAt,
+            listing_url: null,
+          });
+        }
+      }
+    } catch (err) {
+      console.error("TCG pricing error:", err);
+    }
+  }
+
+  // ── eBay Finding API (when available) ──
   const ebayAppId = process.env.EBAY_APP_ID;
   if (ebayAppId) {
     try {

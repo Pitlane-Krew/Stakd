@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card from "@/components/ui/Card";
 import MapView from "@/components/map/MapView";
+import RouteExport from "@/components/routes/RouteExport";
 import { MAX_ROUTE_STOPS } from "@/config/constants";
 
 interface Stop {
@@ -202,6 +203,16 @@ export default function RoutePlannerPage() {
                 <Save className="w-4 h-4" /> Save
               </Button>
             </div>
+
+            {/* Export / Download / Print */}
+            {routeStats && (
+              <div className="pt-2 border-t border-[var(--color-border-subtle)]">
+                <p className="text-[11px] text-[var(--color-text-muted)] mb-2">
+                  Download for offline use
+                </p>
+                <RouteExport stops={stops} routeStats={routeStats} />
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const BETA_MODE = process.env.NEXT_PUBLIC_BETA_MODE === "true";
 
@@ -43,6 +44,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { profile, signOut } = useAuth();
   const { resolved, setTheme } = useTheme();
+  const { isAdmin } = useAdmin();
 
   const isDark = resolved === "dark";
   const visibleItems = navItems.filter((item) => !(BETA_MODE && item.betaHide));
@@ -95,6 +97,21 @@ export default function Navbar() {
             </Link>
           );
         })}
+
+        {/* Admin panel link — only visible to admins */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all mt-2 border-t border-[var(--color-border)] pt-3 ${
+              pathname.startsWith("/admin")
+                ? "bg-orange-500 text-white shadow-sm"
+                : "text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+            }`}
+          >
+            <Shield className="w-[18px] h-[18px]" />
+            Admin Panel
+          </Link>
+        )}
       </nav>
 
       {/* Profile section */}

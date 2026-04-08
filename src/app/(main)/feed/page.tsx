@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Users,
   Search,
@@ -25,10 +25,13 @@ import {
   toggleLike,
   getUserLikedPosts,
   getFollowingSet,
+  getFriendActivity,
   discoverProfiles,
+  searchProfiles,
   followUser,
   unfollowUser,
   type PostWithProfile,
+  type FriendActivity,
 } from "@/services/social";
 
 // ---------------------------------------------------------------
@@ -81,6 +84,7 @@ export default function FeedPage() {
 
   // Data
   const [posts, setPosts] = useState<PostWithProfile[]>([]);
+  const [activities, setActivities] = useState<FriendActivity[]>([]);
   const [likedSet, setLikedSet] = useState<Set<string>>(new Set());
   const [followingSet, setFollowingSet] = useState<Set<string>>(new Set());
   const [profiles, setProfiles] = useState<Array<{
@@ -92,6 +96,8 @@ export default function FeedPage() {
     reputation_score: number;
   }>>([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
+  const searchTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // New post
   const [showCompose, setShowCompose] = useState(false);
@@ -102,12 +108,14 @@ export default function FeedPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const [feedData, likes, following] = await Promise.all([
+      const [feedData, likes, following, activityData] = await Promise.all([
         getFeedPosts(user.id).catch(() => getRecentPosts()),
         getUserLikedPosts(user.id),
         getFollowingSet(user.id),
+        getFriendActivity(user.id, 20).catch(() => [] as FriendActivity[]),
       ]);
       setPosts(feedData);
+      setActivities(activityData);
       setLikedSet(likes);
       setFollowingSet(following);
     } catch (err) {
@@ -126,6 +134,35 @@ export default function FeedPage() {
       console.error("Discover error:", err);
     }
   }, [user]);
+
+  // Debounced server-side member search
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearch(value);
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+      if (!value.trim()) {
+        // Empty search → show default discover list
+        loadDiscover();
+        setSearching(false);
+        return;
+      }
+
+      setSearching(true);
+      searchTimeout.current = setTimeout(async () => {
+        if (!user) return;
+        try {
+          const results = await searchProfiles(value, user.id);
+          setProfiles(results);
+        } catch (err) {
+          console.error("Search error:", err);
+        } finally {
+          setSearching(false);
+        }
+      }, 300); // 300ms debounce
+    },
+    [user, loadDiscover]
+  );
 
   useEffect(() => {
     loadFeed();
@@ -189,14 +226,6 @@ export default function FeedPage() {
       setPosting(false);
     }
   }
-
-  const filteredProfiles = search
-    ? profiles.filter(
-        (u) =>
-          (u.display_name || "").toLowerCase().includes(search.toLowerCase()) ||
-          (u.username || "").toLowerCase().includes(search.toLowerCase())
-      )
-    : profiles;
 
   return (
     <div className="lg:max-w-2xl lg:mx-auto space-y-5">
@@ -280,7 +309,7 @@ export default function FeedPage() {
                 </div>
               ))}
             </div>
-          ) : posts.length === 0 ? (
+          ) : posts.length === 0 && activities.length === 0 ? (
             <div className="text-center py-16 px-6">
               <div className="w-16 h-16 mx-auto rounded-2xl bg-[var(--color-accent-subtle)] flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-[var(--color-accent)]" />
@@ -299,7 +328,74 @@ export default function FeedPage() {
               </Button>
             </div>
           ) : (
-            posts.map((post) => (
+            <>
+            {/* ── Friend Activity (item_added, etc.) ── */}
+            {activities.filter((a) => a.activity_type === "item_added").length > 0 && (
+              <div className="space-y-3 mb-3">
+                {activities
+                  .filter((a) => a.activity_type === "item_added")
+                  .slice(0, 5)
+                  .map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="p-4 rounded-2xl bg-gradient-to-r from-[var(--color-bg-card)] to-[var(--color-accent-subtle)]/30 border border-[var(--color-accent)]/20 space-y-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[var(--color-accent-subtle)] flex items-center justify-center text-xs font-bold text-[var(--color-accent)] shrink-0">
+                        {activity.profile?.avatar_url ? (
+                          <img src={activity.profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          getInitials(activity.profile?.display_name ?? null)
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold truncate">
+                            {activity.profile?.display_name || "Collector"}
+                          </p>
+                          <span className="text-[10px] text-[var(--color-text-muted)]">
+                            {timeAgo(activity.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-[var(--color-text-muted)]">
+                          <Plus className="w-3 h-3 text-emerald-400" />
+                          <span>Added to collection</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 pl-1">
+                      {(activity.metadata as Record<string, unknown>)?.image_url ? (
+                        <img
+                          src={(activity.metadata as Record<string, unknown>).image_url as string}
+                          alt=""
+                          className="w-14 h-14 rounded-xl object-cover border border-[var(--color-border-subtle)]"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-xl bg-[var(--color-bg-elevated)] flex items-center justify-center">
+                          <Package className="w-6 h-6 text-[var(--color-text-muted)]" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {(activity.metadata as Record<string, unknown>)?.title as string || "New Item"}
+                        </p>
+                        <p className="text-xs text-[var(--color-text-muted)] capitalize">
+                          {(activity.metadata as Record<string, unknown>)?.category as string || ""} · {(activity.metadata as Record<string, unknown>)?.condition as string || ""}
+                        </p>
+                        {Number((activity.metadata as Record<string, unknown>)?.estimated_value) > 0 && (
+                          <p className="text-xs font-bold text-emerald-400 mt-0.5">
+                            Est. ${Number((activity.metadata as Record<string, unknown>).estimated_value).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── Posts ── */}
+            {posts.map((post) => (
               <div
                 key={post.id}
                 className="p-4 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] space-y-3"
@@ -374,7 +470,8 @@ export default function FeedPage() {
                   </button>
                 </div>
               </div>
-            ))
+            ))}
+            </>
           )}
         </div>
       )}
@@ -387,19 +484,22 @@ export default function FeedPage() {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search collectors..."
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Search by username or name..."
               className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
             />
+            {searching && (
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
+            )}
           </div>
 
           <div className="space-y-3">
-            {filteredProfiles.length === 0 ? (
+            {profiles.length === 0 ? (
               <div className="text-center py-12 text-sm text-[var(--color-text-muted)]">
                 {search ? "No collectors found" : "No collectors to discover yet"}
               </div>
             ) : (
-              filteredProfiles.map((profile) => (
+              profiles.map((profile) => (
                 <div
                   key={profile.id}
                   className="p-4 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] card-interactive"

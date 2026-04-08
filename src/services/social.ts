@@ -29,7 +29,22 @@ export async function getFriendActivity(
   userId: string,
   limit = 30
 ): Promise<FriendActivity[]> {
-  // Get IDs of users I follow
+  const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
+  // In beta mode, show ALL community activity (small user base)
+  if (isBeta) {
+    const { data, error } = await supabase
+      .from("friend_activity")
+      .select("*, profiles!friend_activity_user_id_fkey(display_name, avatar_url, username)")
+      .neq("user_id", userId) // Exclude own activity
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data ?? []) as unknown as FriendActivity[];
+  }
+
+  // Production: only show activity from followed users
   const { data: follows } = await supabase
     .from("follows")
     .select("following_id")
@@ -159,14 +174,27 @@ export async function getRecentPosts(limit = 30): Promise<PostWithProfile[]> {
 }
 
 export async function getFeedPosts(userId: string, limit = 30): Promise<PostWithProfile[]> {
-  // Get who user follows
+  const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
+  // In beta mode, show ALL community posts (small user base)
+  if (isBeta) {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*, profiles(display_name, username, avatar_url)")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data ?? []) as unknown as PostWithProfile[];
+  }
+
+  // Production: only show posts from followed users + self
   const { data: follows } = await supabase
     .from("follows")
     .select("following_id")
     .eq("follower_id", userId);
 
   const followingIds = (follows ?? []).map((f) => f.following_id);
-  // Include own posts + followed users' posts
   const allIds = [...followingIds, userId];
 
   const { data, error } = await supabase
@@ -230,11 +258,53 @@ export async function getFollowingSet(userId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((f) => f.following_id));
 }
 
-export async function discoverProfiles(currentUserId: string, limit = 20) {
+/**
+ * Discover other members.
+ * In beta mode, returns ALL users (small community — everyone should
+ * be visible and able to follow each other).
+ * In production mode, caps at `limit` sorted by reputation.
+ */
+export async function discoverProfiles(currentUserId: string, limit = 50) {
+  const isBeta = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
+  let query = supabase
+    .from("profiles")
+    .select("id, display_name, username, avatar_url, bio, reputation_score")
+    .neq("id", currentUserId)
+    .order("reputation_score", { ascending: false });
+
+  // In beta, show everyone; in prod, cap to limit
+  if (!isBeta) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Search profiles by username or display name.
+ * Uses ILIKE for prefix + substring matching — works without
+ * full-text search indexes on the profiles table.
+ */
+export async function searchProfiles(
+  query: string,
+  currentUserId: string,
+  limit = 20
+) {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  // Strip leading @ if user types it
+  const cleaned = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
+  const pattern = `%${cleaned}%`;
+
   const { data, error } = await supabase
     .from("profiles")
     .select("id, display_name, username, avatar_url, bio, reputation_score")
     .neq("id", currentUserId)
+    .or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
     .order("reputation_score", { ascending: false })
     .limit(limit);
 
