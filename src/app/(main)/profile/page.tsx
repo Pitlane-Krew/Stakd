@@ -21,7 +21,7 @@ import ReputationBadge from "@/components/trade/ReputationBadge";
 import type { Database } from "@/types/database";
 
 export default function ProfilePage() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth();
   const { tierDef, isPaid } = useTier();
   const { isAdmin, adminRole } = useAdmin();
   const [editing, setEditing] = useState(false);
@@ -49,7 +49,38 @@ export default function ProfilePage() {
     setLoading(false);
   };
 
-  if (!profile) return null;
+  if (authLoading) {
+    return (
+      <div className="lg:max-w-lg lg:mx-auto space-y-6">
+        <div className="h-7 w-40 rounded-lg bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+        <Card className="p-5 space-y-5">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+            <div className="flex-1 space-y-2">
+              <div className="h-5 w-32 rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+              <div className="h-4 w-20 rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 w-full rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+          </div>
+        </Card>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-32 rounded-2xl bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!profile)
+    return (
+      <div className="lg:max-w-lg lg:mx-auto text-center py-16">
+        <p className="text-[var(--color-text-muted)]">
+          Profile not found. Please sign in.
+        </p>
+      </div>
+    );
 
   return (
     <div className="lg:max-w-lg lg:mx-auto space-y-6">

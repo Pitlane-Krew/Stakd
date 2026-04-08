@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getApiUser, checkRateLimit } from "@/lib/api-auth";
 
 /**
  * POST /api/import/scan-photo
@@ -24,6 +25,19 @@ interface DetectedItem {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const { user, error: authError } = await getApiUser();
+    if (authError) return authError;
+
+    // Check rate limit (20 per hour)
+    const { allowed, remaining } = await checkRateLimit(user!.id, "scan_photo", 20);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Try again in an hour." },
+        { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
+      );
+    }
+
     const { imageUrl, category } = await request.json();
 
     if (!imageUrl) {

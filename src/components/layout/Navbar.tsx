@@ -42,9 +42,9 @@ const navItems = [
  */
 export default function Navbar() {
   const pathname = usePathname();
-  const { profile, signOut } = useAuth();
+  const { profile, loading, signOut } = useAuth();
   const { resolved, setTheme } = useTheme();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, loading: adminLoading } = useAdmin();
 
   const isDark = resolved === "dark";
   const visibleItems = navItems.filter((item) => !(BETA_MODE && item.betaHide));
@@ -99,7 +99,7 @@ export default function Navbar() {
         })}
 
         {/* Admin panel link — only visible to admins */}
-        {isAdmin && (
+        {!adminLoading && isAdmin && (
           <Link
             href="/admin"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all mt-2 border-t border-[var(--color-border)] pt-3 ${
@@ -116,7 +116,15 @@ export default function Navbar() {
 
       {/* Profile section */}
       <div className="p-3 border-t border-[var(--color-border)]">
-        {profile ? (
+        {loading ? (
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+            <div className="flex-1 space-y-1.5">
+              <div className="h-3.5 w-24 rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+              <div className="h-3 w-16 rounded bg-gradient-to-r from-[var(--color-bg-hover)] to-[var(--color-bg-card)] animate-pulse" />
+            </div>
+          </div>
+        ) : profile ? (
           <div className="flex items-center gap-3 px-2 py-2">
             <Link
               href="/profile"

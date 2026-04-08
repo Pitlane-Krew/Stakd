@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { getApiUser, checkRateLimit } from "@/lib/api-auth";
 
 /**
  * POST /api/grading/analyze
@@ -37,6 +38,19 @@ interface GradingAnalysis {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const { user, error: authError } = await getApiUser();
+    if (authError) return authError;
+
+    // Check rate limit (10 per hour)
+    const { allowed, remaining } = await checkRateLimit(user!.id, "ai_grade", 10);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Try again in an hour." },
+        { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
+      );
+    }
+
     const { imageUrl, category, itemId, metadata } = await request.json();
 
     if (!imageUrl) {

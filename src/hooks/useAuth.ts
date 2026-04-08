@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
@@ -9,15 +9,28 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    setProfile(data);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (fetchError) {
+        console.error("Error fetching profile:", fetchError);
+        setError(fetchError.message);
+      } else {
+        setProfile(data);
+        setError(null);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      console.error("Error fetching profile:", errorMessage);
+      setError(errorMessage);
+    }
   }, [supabase]);
 
   useEffect(() => {
@@ -50,7 +63,8 @@ export function useAuth() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setError(null);
   };
 
-  return { user, profile, loading, signOut, refreshProfile: () => user && fetchProfile(user.id) };
+  return { user, profile, loading, error, signOut, refreshProfile: () => user && fetchProfile(user.id) };
 }

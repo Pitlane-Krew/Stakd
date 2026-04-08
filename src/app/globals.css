@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /* ─── Dark Theme (default) — Carolina Blue core ─── */
@@ -26,6 +27,17 @@
   --color-danger: #ef4444;
   --color-danger-subtle: rgba(239, 68, 68, 0.15);
   --color-shadow: rgba(0, 0, 0, 0.4);
+
+  /* Category accent colors */
+  --color-cat-pokemon: #FBBF24;
+  --color-cat-sports: #3B82F6;
+  --color-cat-hot-wheels: #EF4444;
+  --color-cat-f1: #E10600;
+  --color-cat-figures: #8B5CF6;
+  --color-cat-sneakers: #F97316;
+  --color-cat-one-piece: #D97706;
+  --color-cat-comics: #06B6D4;
+  --color-cat-memorabilia: #10B981;
 }
 
 /* ─── Light Theme — Duke Blue core ─── */
@@ -53,6 +65,17 @@
   --color-danger: #dc2626;
   --color-danger-subtle: rgba(220, 38, 38, 0.08);
   --color-shadow: rgba(0, 0, 0, 0.08);
+
+  /* Category accent colors */
+  --color-cat-pokemon: #FBBF24;
+  --color-cat-sports: #3B82F6;
+  --color-cat-hot-wheels: #EF4444;
+  --color-cat-f1: #E10600;
+  --color-cat-figures: #8B5CF6;
+  --color-cat-sneakers: #F97316;
+  --color-cat-one-piece: #D97706;
+  --color-cat-comics: #06B6D4;
+  --color-cat-memorabilia: #10B981;
 }
 
 /* ─── Base Styles ─── */
@@ -64,7 +87,7 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -165,6 +188,42 @@ main > * {
   outline-offset: 2px;
 }
 
+/* ─── Hover lift for cards ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Staggered fade in for lists */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Number counter animation */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Subtle pulse for live indicators */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Glow effect for rare/high-value items */
+@keyframes rare-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.3); }
+}
+
 /* ─── Card Shadows ─── */
 .card-shadow {
   box-shadow: 0 1px 3px var(--color-shadow), 0 1px 2px var(--color-shadow);
@@ -229,3 +288,80 @@ main > * {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ─── Premium Utility Classes ─── */
+
+/* Staggered list children */
+.stagger-children > * {
+  animation: stagger-in 0.3s ease-out both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--color-shadow), 0 4px 10px var(--color-shadow);
+}
+
+/* Rare item glow */
+.rare-glow {
+  animation: rare-glow 3s ease-in-out infinite;
+}
+
+/* Premium glassmorphism card */
+.glass-card {
+  background: rgba(24, 24, 27, 0.6);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+}
+
+:root.light .glass-card,
+:root[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(212, 212, 216, 0.5);
+}
+
+/* Gradient border effect */
+.gradient-border {
+  position: relative;
+  border: none !important;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-success));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Animated value display */
+.value-animate {
+  animation: count-up 0.4s ease-out;
+}
+
+/* Live indicator dot */
+.live-dot {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Premium shadows (depth levels) */
+.shadow-depth-1 { box-shadow: 0 1px 3px var(--color-shadow); }
+.shadow-depth-2 { box-shadow: 0 4px 12px var(--color-shadow); }
+.shadow-depth-3 { box-shadow: 0 8px 25px var(--color-shadow), 0 4px 10px var(--color-shadow); }
+.shadow-depth-4 { box-shadow: 0 20px 60px var(--color-shadow), 0 8px 20px var(--color-shadow); }

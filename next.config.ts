@@ -9,16 +9,18 @@ const csp = [
   "default-src 'self'",
   // Scripts: Next.js chunks + inline (needed for RSC hydration)
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://api.mapbox.com",
-  // Styles: self + inline
-  "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
-  // Images: self + Supabase storage + data URIs
+  // Styles: self + inline + Google Fonts
+  "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
+  // Images: self + Supabase storage + data URIs + blob (for camera captures)
   `img-src 'self' data: blob: https://${supabaseHost} https://api.mapbox.com https://events.mapbox.com`,
-  // Fonts
-  "font-src 'self' data:",
-  // Connect: API calls allowed
-  `connect-src 'self' https://${supabaseHost} https://api.mapbox.com https://events.mapbox.com wss://${supabaseHost}`,
+  // Fonts: self + data URIs + Google Fonts
+  "font-src 'self' data: https://fonts.gstatic.com",
+  // Connect: API calls allowed (Supabase, Mapbox, and Anthropic for AI features)
+  `connect-src 'self' https://${supabaseHost} https://api.mapbox.com https://events.mapbox.com wss://${supabaseHost} https://api.anthropic.com`,
   // Workers (Next.js, Mapbox)
   "worker-src 'self' blob:",
+  // Media: allow camera/microphone access
+  "media-src 'self' blob:",
   // Frames: deny everything
   "frame-src 'none'",
   "frame-ancestors 'none'",
@@ -56,7 +58,7 @@ const securityHeaders = [
   },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(self), payment=()",
+    value: "camera=(self), microphone=(), geolocation=(self), payment=()",
   },
   {
     key: "Content-Security-Policy",

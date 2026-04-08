@@ -11,6 +11,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
+import { createClient } from "@/lib/supabase/client";
 
 interface MomentumData {
   itemId: string;
@@ -88,28 +89,7 @@ function getMomentumTextColor(momentum: string): string {
   }
 }
 
-/**
- * Compute momentum from price history.
- * In production this would call the valuation API;
- * here we simulate based on available data.
- */
-function computeMomentum(
-  item: { id: string; title: string; category: string; estimated_value: number | null }
-): MomentumData {
-  // Simulated momentum calculation — in prod, compare price_history rows
-  const price = item.estimated_value ?? 0;
-  const seed = item.title.length + (item.estimated_value ?? 0);
-  const change7d = ((seed % 20) - 10) * 0.5;
-  const change30d = ((seed % 30) - 15) * 0.8;
-  const change90d = ((seed % 40) - 20) * 1.2;
-  const vol = Math.floor(seed % 50) + 5;
-
-  let momentum: MomentumData["momentum"] = "stable";
-  if (change7d > 5 && change30d > 10) momentum = "hot";
-  else if (change7d > 2) momentum = "rising";
-  else if (change7d < -5 && change30d < -10) momentum = "cold";
-  else if (change7d < -2) momentum = "cooling";
-
+function classifyMomentum(change7d: number, change30d: number): { momentum: MomentumData["momentum"]; badge: string } {
   const badges: Record<string, string> = {
     hot: "On Fire",
     rising: "Trending",
@@ -118,18 +98,13 @@ function computeMomentum(
     cold: "Bargain",
   };
 
-  return {
-    itemId: item.id,
-    title: item.title,
-    category: item.category,
-    currentPrice: price,
-    priceChange7d: change7d,
-    priceChange30d: change30d,
-    priceChange90d: change90d,
-    volume7d: vol,
-    momentum,
-    badge: badges[momentum],
-  };
+  let momentum: MomentumData["momentum"] = "stable";
+  if (change7d > 5 && change30d > 10) momentum = "hot";
+  else if (change7d > 2) momentum = "rising";
+  else if (change7d < -5 && change30d < -10) momentum = "cold";
+  else if (change7d < -2) momentum = "cooling";
+
+  return { momentum, badge: badges[momentum] };
 }
 
 export default function MarketMomentum({ items, category }: Props) {
@@ -138,12 +113,80 @@ export default function MarketMomentum({ items, category }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (items?.length) {
-      setData(items.map(computeMomentum));
+    if (!items?.length) {
       setLoading(false);
-    } else {
-      setLoading(false);
+      return;
     }
+
+    const fetchMomentum = async () => {
+      const supabase = createClient();
+      const now = new Date();
+      const days7 = new Date(now.getTime() - 7 * 86400000).toISOString();
+      const days30 = new Date(now.getTime() - 30 * 86400000).toISOString();
+      const days90 = new Date(now.getTime() - 90 * 86400000).toISOString();
+
+      const results: MomentumData[] = [];
+
+      for (const item of items) {
+        const currentPrice = item.estimated_value ?? 0;
+        if (currentPrice <= 0) continue;
+
+        // Fetch price history for this item
+        const { data: history } = await supabase
+          .from("price_history")
+          .select("price, fetched_at")
+          .eq("item_id", item.id)
+          .gte("fetched_at", days90)
+          .order("fetched_at", { ascending: true });
+
+        if (!history || history.length === 0) {
+          // No history — use current price with 0% change (stable)
+          results.push({
+            itemId: item.id,
+            title: item.title,
+            category: item.category,
+            currentPrice,
+            priceChange7d: 0,
+            priceChange30d: 0,
+            priceChange90d: 0,
+            volume7d: 0,
+            ...classifyMomentum(0, 0),
+          });
+          continue;
+        }
+
+        // Calculate price changes
+        const price7d = history.find(h => h.fetched_at >= days7)?.price ?? currentPrice;
+        const price30d = history.find(h => h.fetched_at >= days30)?.price ?? currentPrice;
+        const price90d = history[0]?.price ?? currentPrice;
+
+        const change7d = price7d > 0 ? ((currentPrice - price7d) / price7d) * 100 : 0;
+        const change30d = price30d > 0 ? ((currentPrice - price30d) / price30d) * 100 : 0;
+        const change90d = price90d > 0 ? ((currentPrice - price90d) / price90d) * 100 : 0;
+
+        // Count entries in last 7 days as "volume"
+        const volume7d = history.filter(h => h.fetched_at >= days7).length;
+
+        results.push({
+          itemId: item.id,
+          title: item.title,
+          category: item.category,
+          currentPrice,
+          priceChange7d: Math.round(change7d * 10) / 10,
+          priceChange30d: Math.round(change30d * 10) / 10,
+          priceChange90d: Math.round(change90d * 10) / 10,
+          volume7d,
+          ...classifyMomentum(change7d, change30d),
+        });
+      }
+
+      // Sort by absolute change
+      results.sort((a, b) => Math.abs(b.priceChange7d) - Math.abs(a.priceChange7d));
+      setData(results);
+      setLoading(false);
+    };
+
+    fetchMomentum();
   }, [items]);
 
   if (loading) {

@@ -24,6 +24,12 @@ import Card from "@/components/ui/Card";
 import { formatCurrency } from "@/lib/utils";
 import { CATEGORIES } from "@/config/constants";
 import { getCategory } from "@/config/category-registry";
+import PortfolioChart from "@/components/portfolio/PortfolioChart";
+import TrendingItems from "@/components/market/TrendingItems";
+import Watchlist from "@/components/collection/Watchlist";
+import WelcomeWizard from "@/components/onboarding/WelcomeWizard";
+import type { WizardResult } from "@/components/onboarding/WelcomeWizard";
+import { createClient } from "@/lib/supabase/client";
 
 interface Analytics {
   collectionCount: number;
@@ -44,13 +50,47 @@ export default function DashboardPage() {
   const { tierDef, isPaid } = useTier();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     getCollectionAnalytics(user.id)
-      .then(setAnalytics)
+      .then((data) => {
+        setAnalytics(data);
+        // Check if user needs onboarding (no collections yet and first login)
+        if (data.collectionCount === 0 && profile?.created_at) {
+          const daysSinceCreation = (Date.now() - new Date(profile.created_at).getTime()) / 86400000;
+          if (daysSinceCreation < 7) {
+            setShowOnboarding(true);
+          }
+        }
+      })
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, profile]);
+
+  const handleOnboardingComplete = async (result: WizardResult) => {
+    if (!user) return;
+    const supabase = createClient();
+
+    // Save display name if provided
+    if (result.displayName) {
+      await supabase.from("profiles").update({
+        display_name: result.displayName,
+      } as any).eq("id", user.id);
+    }
+
+    setShowOnboarding(false);
+    // Refresh profile to show updated name
+    window.location.reload();
+  };
+
+  if (showOnboarding) {
+    return (
+      <div className="lg:max-w-lg lg:mx-auto py-8">
+        <WelcomeWizard onComplete={handleOnboardingComplete} />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -199,6 +239,11 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* ── Portfolio Value Chart ── */}
+      {user && analytics && analytics.totalValue > 0 && (
+        <PortfolioChart userId={user.id} totalValue={analytics.totalValue} />
+      )}
+
       {/* ── Top Collections ── */}
       {analytics && analytics.collections.length > 0 && (
         <section>
@@ -331,6 +376,12 @@ export default function DashboardPage() {
           </div>
         </section>
       )}
+
+      {/* ── Trending Items ── */}
+      <TrendingItems />
+
+      {/* ── Watchlist ── */}
+      <Watchlist />
     </div>
   );
 }

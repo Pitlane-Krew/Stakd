@@ -5,8 +5,8 @@
 -- ============================================================
 
 -- Grant super_admin to designermbp@gmail.com
-INSERT INTO admin_roles (user_id, role, granted_by)
-SELECT au.id, 'super_admin', au.id
+INSERT INTO admin_roles (user_id, role)
+SELECT au.id, 'super_admin'
 FROM auth.users au
 WHERE au.email = 'designermbp@gmail.com'
   AND NOT EXISTS (
@@ -14,8 +14,8 @@ WHERE au.email = 'designermbp@gmail.com'
   );
 
 -- Grant super_admin to kronoztime@gmail.com
-INSERT INTO admin_roles (user_id, role, granted_by)
-SELECT au.id, 'super_admin', au.id
+INSERT INTO admin_roles (user_id, role)
+SELECT au.id, 'super_admin'
 FROM auth.users au
 WHERE au.email = 'kronoztime@gmail.com'
   AND NOT EXISTS (
@@ -23,8 +23,8 @@ WHERE au.email = 'kronoztime@gmail.com'
   );
 
 -- Also grant super_admin to bizzysquad@gmail.com (project owner)
-INSERT INTO admin_roles (user_id, role, granted_by)
-SELECT au.id, 'super_admin', au.id
+INSERT INTO admin_roles (user_id, role)
+SELECT au.id, 'super_admin'
 FROM auth.users au
 WHERE au.email = 'bizzysquad@gmail.com'
   AND NOT EXISTS (

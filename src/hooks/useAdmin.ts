@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "./useAuth";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,32 +14,44 @@ export function useAdmin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminRole, setAdminRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     if (!user) {
       setIsAdmin(false);
       setAdminRole(null);
+      setError(null);
       setLoading(false);
       return;
     }
 
     const check = async () => {
       try {
-        const supabase = createClient();
-        const { data } = await supabase
+        const { data, error: fetchError } = await supabase
           .from("admin_roles")
           .select("role")
           .eq("user_id", user.id)
           .single();
 
-        if (data?.role) {
+        if (fetchError) {
+          console.error("Error checking admin role:", fetchError);
+          setError(fetchError.message);
+          setIsAdmin(false);
+          setAdminRole(null);
+        } else if (data?.role) {
           setIsAdmin(true);
           setAdminRole(data.role);
+          setError(null);
         } else {
           setIsAdmin(false);
           setAdminRole(null);
+          setError(null);
         }
-      } catch {
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        console.error("Error checking admin role:", errorMessage);
+        setError(errorMessage);
         setIsAdmin(false);
         setAdminRole(null);
       } finally {
@@ -48,7 +60,7 @@ export function useAdmin() {
     };
 
     check();
-  }, [user]);
+  }, [user, supabase]);
 
-  return { isAdmin, adminRole, loading };
+  return { isAdmin, adminRole, loading, error };
 }
