@@ -72,7 +72,7 @@ export default function UpgradeGate({
             <div>
               <p className="text-sm font-semibold">{message}</p>
               <p className="text-xs text-[var(--color-text-muted)] mt-1">
-                Starting at $7.99/mo
+                Starting at $5.99/mo
               </p>
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)] group-hover:gap-2 transition-all">

@@ -10,9 +10,9 @@ if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await getApiUser();
-    if (!user) {
-      return NextResponse.json(
+    const { user, error: authError } = await getApiUser();
+    if (authError || !user) {
+      return authError ?? NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );

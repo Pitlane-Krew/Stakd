@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
           <option value="all">All Tiers</option>
           <option value="free">Free</option>
           <option value="pro">Pro</option>
-          <option value="elite">Elite</option>
+          <option value="elite">VIP</option>
         </select>
       </div>
 
@@ -255,20 +255,44 @@ export default function AdminUsersPage() {
                               </button>
                             )}
                             <div className="border-t border-white/10 my-1" />
+                            <p className="px-3 py-1 text-[10px] text-white/30 uppercase tracking-wider">Tier Management</p>
                             <button
-                              onClick={() => performAction(user.id, "grant_pro")}
+                              onClick={() => performAction(user.id, "grant_pro", { reason: "Admin comp", tier_duration_days: 30 })}
                               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-purple-400 hover:bg-white/5"
                               disabled={actionLoading}
                             >
-                              <Sparkles className="w-3.5 h-3.5" /> Grant Pro
+                              <Sparkles className="w-3.5 h-3.5" /> Pro (30 days)
                             </button>
                             <button
-                              onClick={() => performAction(user.id, "grant_elite")}
+                              onClick={() => performAction(user.id, "grant_pro", { reason: "Admin comp" })}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-purple-400 hover:bg-white/5"
+                              disabled={actionLoading}
+                            >
+                              <Sparkles className="w-3.5 h-3.5" /> Pro (indefinite)
+                            </button>
+                            <button
+                              onClick={() => performAction(user.id, "grant_elite", { reason: "Admin comp", tier_duration_days: 30 })}
                               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-amber-400 hover:bg-white/5"
                               disabled={actionLoading}
                             >
-                              <Crown className="w-3.5 h-3.5" /> Grant Elite
+                              <Crown className="w-3.5 h-3.5" /> VIP (30 days)
                             </button>
+                            <button
+                              onClick={() => performAction(user.id, "grant_elite", { reason: "Admin comp" })}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-amber-400 hover:bg-white/5"
+                              disabled={actionLoading}
+                            >
+                              <Crown className="w-3.5 h-3.5" /> VIP (indefinite)
+                            </button>
+                            {user.tier !== "free" && (
+                              <button
+                                onClick={() => performAction(user.id, "revoke_tier")}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-400 hover:bg-white/5"
+                                disabled={actionLoading}
+                              >
+                                <Ban className="w-3.5 h-3.5" /> Revoke to Free
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>

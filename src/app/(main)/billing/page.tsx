@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CreditCard, ChevronRight, AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
+import { CreditCard, ChevronRight, AlertCircle, CheckCircle, TrendingUp, Gift, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTier } from "@/hooks/useTier";
 import Card from "@/components/ui/Card";
@@ -418,6 +418,9 @@ export default function BillingPage() {
             </div>
           </Card>
 
+          {/* Promo Code Redemption */}
+          <PromoCodeSection userId={user?.id} onRedeemed={loadBillingData} />
+
           {/* Danger Zone */}
           {subscription && (
             <Card className="p-6 border-[var(--color-danger)]">
@@ -450,6 +453,74 @@ interface UsageBarProps {
   max: number;
   description: string;
   percent: number;
+}
+
+function PromoCodeSection({ userId, onRedeemed }: { userId?: string; onRedeemed: () => void }) {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  async function handleRedeem() {
+    if (!code.trim() || !userId) return;
+    setLoading(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/promo/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: code.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage({ type: "success", text: data.message });
+        setCode("");
+        onRedeemed();
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to redeem code" });
+      }
+    } catch {
+      setMessage({ type: "error", text: "Something went wrong. Try again." });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card className="p-6">
+      <h2 className="text-lg font-semibold text-[var(--color-text)] mb-2 flex items-center gap-2">
+        <Gift className="w-5 h-5 text-[var(--color-accent)]" />
+        Promo Code
+      </h2>
+      <p className="text-sm text-[var(--color-text-muted)] mb-4">
+        Have an invite or promo code? Enter it below to unlock features.
+      </p>
+      <div className="flex gap-3">
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder="Enter code..."
+          className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-sm font-mono uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          onKeyDown={(e) => e.key === "Enter" && handleRedeem()}
+          disabled={loading}
+        />
+        <Button onClick={handleRedeem} disabled={loading || !code.trim()}>
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Redeem"}
+        </Button>
+      </div>
+      {message && (
+        <div
+          className={`mt-3 p-3 rounded-lg text-sm ${
+            message.type === "success"
+              ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+              : "bg-red-500/10 text-red-500 border border-red-500/20"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+    </Card>
+  );
 }
 
 function UsageBar({ label, current, max, description, percent }: UsageBarProps) {

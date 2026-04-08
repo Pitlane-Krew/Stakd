@@ -9,6 +9,8 @@ const actionSchema = z.object({
   action: z.enum(["suspend", "unsuspend", "ban", "restore", "grant_pro", "grant_elite", "revoke_tier"]),
   reason: z.string().max(500).optional(),
   suspend_days: z.number().int().min(1).max(365).optional(),
+  /** Number of days the comp'd tier lasts. Omit or 0 for indefinite. */
+  tier_duration_days: z.number().int().min(0).max(365).optional(),
 });
 
 export async function PATCH(
@@ -25,7 +27,7 @@ export async function PATCH(
   // Parse body
   const bodyResult = await parseBody(request, actionSchema);
   if ("error" in bodyResult) return bodyResult.error;
-  const { action, reason, suspend_days } = bodyResult.data;
+  const { action, reason, suspend_days, tier_duration_days } = bodyResult.data;
 
   const supabase = await createServiceRoleClient();
 
@@ -84,17 +86,38 @@ export async function PATCH(
       break;
     }
     case "grant_pro": {
-      updatePayload = { tier: "pro" };
+      const expiresAt = tier_duration_days
+        ? new Date(Date.now() + tier_duration_days * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+      updatePayload = {
+        tier: "pro",
+        tier_expires_at: expiresAt,
+        tier_granted_by: "admin",
+        tier_grant_reason: reason ?? "Admin comp",
+      };
       auditAction = "user.tier_grant";
       break;
     }
     case "grant_elite": {
-      updatePayload = { tier: "elite" };
+      const expiresAt = tier_duration_days
+        ? new Date(Date.now() + tier_duration_days * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+      updatePayload = {
+        tier: "elite",
+        tier_expires_at: expiresAt,
+        tier_granted_by: "admin",
+        tier_grant_reason: reason ?? "Admin comp",
+      };
       auditAction = "user.tier_grant";
       break;
     }
     case "revoke_tier": {
-      updatePayload = { tier: "free" };
+      updatePayload = {
+        tier: "free",
+        tier_expires_at: null,
+        tier_granted_by: null,
+        tier_grant_reason: null,
+      };
       auditAction = "user.tier_revoke";
       break;
     }

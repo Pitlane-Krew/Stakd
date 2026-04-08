@@ -6,9 +6,9 @@ import { stripe } from "@/lib/stripe";
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await getApiUser();
-    if (!user) {
-      return NextResponse.json(
+    const { user, error: authError } = await getApiUser();
+    if (authError || !user) {
+      return authError ?? NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
