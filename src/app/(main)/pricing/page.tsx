@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, X, Sparkles, Crown, Zap, Loader2 } from "lucide-react";
 import Card from "@/components/ui/Card";
@@ -9,6 +9,20 @@ import { TIERS, type TierLevel } from "@/config/tiers";
 import { useTier } from "@/hooks/useTier";
 
 export default function PricingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--color-text-muted)]" />
+        </div>
+      }
+    >
+      <PricingContent />
+    </Suspense>
+  );
+}
+
+function PricingContent() {
   const [annual, setAnnual] = useState(true);
   const [loading, setLoading] = useState<string | null>(null);
   const router = useRouter();
