@@ -49,7 +49,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF NOT EXISTS trg_items_update_search_vector ON public.items;
+DROP TRIGGER IF EXISTS trg_items_update_search_vector ON public.items;
 CREATE TRIGGER trg_items_update_search_vector
   BEFORE INSERT OR UPDATE ON public.items
   FOR EACH ROW EXECUTE FUNCTION update_items_search_vector();
@@ -95,7 +95,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF NOT EXISTS trg_profiles_update_search_vector ON public.profiles;
+DROP TRIGGER IF EXISTS trg_profiles_update_search_vector ON public.profiles;
 CREATE TRIGGER trg_profiles_update_search_vector
   BEFORE INSERT OR UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION update_profiles_search_vector();
@@ -139,7 +139,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF NOT EXISTS trg_restocks_update_search_vector ON public.restocks;
+DROP TRIGGER IF EXISTS trg_restocks_update_search_vector ON public.restocks;
 CREATE TRIGGER trg_restocks_update_search_vector
   BEFORE INSERT OR UPDATE ON public.restocks
   FOR EACH ROW EXECUTE FUNCTION update_restocks_search_vector();
