@@ -1,3 +1,4 @@
+import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email';
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile with email
-    const supabase = createServiceRoleClient();
+    const supabase = await createServiceRoleClient();
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, username, display_name, email_preferences')
