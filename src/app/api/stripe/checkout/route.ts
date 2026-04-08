@@ -3,10 +3,6 @@ import { getApiUser } from "@/lib/api-auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { stripe, getPriceId } from "@/lib/stripe";
 
-if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-  throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable is not set");
-}
-
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user

@@ -1,12 +1,33 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+/**
+ * Stripe client — initialized lazily so the app can build and run
+ * even when Stripe env vars are not yet configured.
+ * Stripe is deferred until paid launch; calls will fail gracefully
+ * with a clear error if someone hits a payment route before setup.
+ */
+let _stripe: Stripe | null = null;
+
+export function getStripeClient(): Stripe {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error(
+        "Stripe is not configured yet. Set STRIPE_SECRET_KEY to enable payments."
+      );
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2024-12-18.acacia",
+      typescript: true,
+    });
+  }
+  return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-  typescript: true,
+/** @deprecated Use getStripeClient() — kept for backward compat */
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return (getStripeClient() as Record<string | symbol, unknown>)[prop];
+  },
 });
 
 /**
@@ -18,7 +39,7 @@ export function verifyWebhookSignature(body: string, signature: string): object 
   }
 
   try {
-    return stripe.webhooks.constructEvent(
+    return getStripeClient().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
